@@ -18,12 +18,12 @@ int main(int argc, char **argv)
         std::getline(fs, line);
     #else
         std::getline(std::cin, line);
-    #endif
 
         if (std::all_of(line.begin(), line.end(), isspace))
         {
             break;
         }
+    #endif
 
         lexer lex = lexer(line);
         auto tokens = lex.lex_contents();
