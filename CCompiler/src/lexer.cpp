@@ -1,7 +1,6 @@
 #include "lexer.h"
 
 #include "definitions.h"
-
 #include <cctype>
 
 std::vector<token> lexer::lex_contents()
@@ -16,11 +15,11 @@ std::vector<token> lexer::lex_contents()
     return tokens;
 }
 
-char lexer::current()
+char lexer::current() const
 {
-    if (index_ > source_.size())
+    if (index_ >= source_.size())
     {
-        return '\0';
+        return chardefs::eof;
     }
     return source_[index_];
 }
@@ -38,27 +37,35 @@ void lexer::consume()
 
 token lexer::next_token()
 {
+    // Cache starting index of token
     token_start_ = index_;
 
-    if (current() == chardefs::eof)
+    // Cache first char
+    char first_char = current();
+
+    // Nothing to lex if current() == eof
+    if (first_char == chardefs::eof)
     {
         return create_token(token_type::eof);
     }
-    if (isalpha(current()) || current() == chardefs::underscore)
+
+    // Look for keyword or literal
+    if (std::isalpha(first_char) || first_char == chardefs::underscore)
     {
         return read_identifier();
     }
-    if (isdigit(current()))
+    if (std::isdigit(first_char))
     {
         return read_integer();
     }
-    if (isspace(current()))
+    if (std::isspace(first_char))
     {
         skip_space();
         return next_token();
     }
 
-    switch (current())
+    // Not keyword nor literal, so look for separator
+    switch (first_char)
     {
     case chardefs::plus:
         {
@@ -100,6 +107,26 @@ token lexer::next_token()
             consume();
             return create_token(token_type::close_brace);
         }
+    case chardefs::open_angle:
+        {
+            consume();
+            return create_token(token_type::open_angle);
+        }
+    case chardefs::close_angle:
+        {
+            consume();
+            return create_token(token_type::close_angle);
+        }
+    case chardefs::open_square:
+        {
+            consume();
+            return create_token(token_type::open_square);
+        }
+    case chardefs::close_square:
+        {
+            consume();
+            return create_token(token_type::close_square);
+        }
     case chardefs::semicolon:
         {
             consume();
@@ -107,12 +134,13 @@ token lexer::next_token()
         }
     }
 
+    // Could not identify the token
     return read_unknown();
 }
 
 token lexer::read_identifier()
 {
-    while (isalnum(current()) || current() == chardefs::underscore)
+    while (std::isalnum(current()) || current() == chardefs::underscore)
     {
         consume();
     }
@@ -125,7 +153,7 @@ token lexer::read_identifier()
 
 void lexer::skip_space()
 {
-    while (isspace(current()))
+    while (std::isspace(current()))
     {
         next();
     }
@@ -133,50 +161,69 @@ void lexer::skip_space()
 
 token lexer::read_integer()
 {
-    while (isdigit(current()))
+    while (std::isdigit(current()))
     {
         consume();
     }
-    if (current() == chardefs::period)
+
+    // A non-digit char was hit
+    char breaking_char = current();
+
+    // Handle special cases
+    switch (breaking_char)
     {
-        consume();
-        return read_double();
+    case chardefs::period:
+        {
+            consume();
+            return read_double();
+        }
+    case 'e':
+        {
+            consume();
+            return read_exponent();
+        }
     }
-    if (current() == 'e')
-    {
-        consume();
-        return read_exponent();
-    }
+
     return create_token(token_type::integer);
 }
 
 token lexer::read_double()
 {
+    // Keep track of mantissa length
     std::size_t mantissa_length = 0;
 
-    while (isdigit(current()))
+    while (std::isdigit(current()))
     {
         mantissa_length++;
         consume();
     }
 
+    // A double must have a mantissa
     if (mantissa_length == 0)
     {
         return read_unknown();
     }
-    if (current() == chardefs::period)
+
+    // A non-digit char was hit
+    char breaking_char = current();
+
+    // Handle special cases
+    switch (breaking_char)
     {
-        return read_unknown();
-    }
-    if (current() == 'e')
-    {
-        consume();
-        return read_exponent();
-    }
-    if (current() == 'f')
-    {
-        consume();
-        return read_float();
+    case chardefs::period:
+        {
+            return read_unknown();
+        }
+    case 'e':
+        {
+            consume();
+            return read_exponent();
+        }
+    case 'f':
+        {
+            consume();
+            return read_float();
+        }
     }
 
     return create_token(token_type::double_precision);
@@ -184,28 +231,33 @@ token lexer::read_double()
 
 token lexer::read_float()
 {
+    // This method is only called when current() == 'f',
+    // at which point the float token is complete.
     return create_token(token_type::single_precision);
 }
 
 token lexer::read_exponent()
 {
+    // Consume an optional + or - character
     if (current() == chardefs::plus || current() == chardefs::dash)
     {
         consume();
     }
 
     std::size_t exponent_length = 0;
-    while (isdigit(current()))
+    while (std::isdigit(current()))
     {
         exponent_length++;
         consume();
     }
 
+    // An exponent must have a value
     if (exponent_length == 0)
     {
         return read_unknown();
     }
 
+    // Check for float suffix
     if (current() == 'f')
     {
         consume();
@@ -217,14 +269,14 @@ token lexer::read_exponent()
 
 token lexer::read_unknown()
 {
-    while (!isspace(current()) && !current() == chardefs::eof)
+    while (!std::isspace(current()) && !current() == chardefs::eof)
     {
         consume();
     }
     return create_token(token_type::invalid);
 }
 
-bool lexer::is_keyword()
+bool lexer::is_keyword() const
 {
     // TODO: Maybe automate this
     std::string text = buffer_.str();
