@@ -2,11 +2,10 @@
 #define C_COMPILER_TOKEN_H
 
 #include "token_type.h"
-
 #include <cstddef>
 #include <string>
 
-class [[nodiscard]] token
+class token
 {
 public:
     token(token_type type, std::size_t pos, std::string text)
