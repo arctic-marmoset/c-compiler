@@ -11,16 +11,14 @@ public:
     token(token_type type, std::size_t pos, std::string text)
         : type(type)
         , text(std::move(text))
-        , pos_(pos)
+        , pos(pos)
     {
     }
 
 public:
-    token_type type;
-    std::string text;
-
-private:
-    std::size_t pos_;
+    const token_type type;
+    const std::string text;
+    const std::size_t pos;
 };
 
 #endif // !C_COMPILER_TOKEN_H
