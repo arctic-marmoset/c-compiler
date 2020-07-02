@@ -52,6 +52,10 @@ enum class token_type
     close_paren,
     open_brace,
     close_brace,
+    open_angle,
+    close_angle,
+    open_square,
+    close_square,
     semicolon,
 
     eof,
