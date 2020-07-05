@@ -1,6 +1,9 @@
 #include "lexer.h"
+#include "parser.h"
 #include <algorithm>
 #include <fstream>
+
+using namespace std::string_literals;
 
 // TODO: Clean up interactive console vs cmdline exec selection
 void run(std::string fileName);
@@ -23,7 +26,7 @@ void run_debug()
         std::string source;
 
         std::getline(std::cin, source);
-        if (std::all_of(source.begin(), source.end(), isspace))
+        if (std::all_of(source.begin(), source.end(), std::isspace))
         {
             break;
         }

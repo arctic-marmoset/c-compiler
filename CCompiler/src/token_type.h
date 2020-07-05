@@ -56,6 +56,7 @@ enum class token_type
     close_angle,
     open_square,
     close_square,
+    comma,
     semicolon,
 
     eof,

@@ -1,6 +1,5 @@
 #include "lexer.h"
 
-#include "definitions.h"
 #include <cctype>
 
 std::vector<token> lexer::lex_contents()
@@ -13,26 +12,6 @@ std::vector<token> lexer::lex_contents()
     }
 
     return tokens;
-}
-
-char lexer::current() const
-{
-    if (index_ >= source_.size())
-    {
-        return chardefs::eof;
-    }
-    return source_[index_];
-}
-
-void lexer::next()
-{
-    index_++;
-}
-
-void lexer::consume()
-{
-    buffer_ << current();
-    next();
 }
 
 token lexer::next_token()
@@ -50,6 +29,11 @@ token lexer::next_token()
     }
 
     // Look for keyword or literal
+    if (first_char == chardefs::quote)
+    {
+        consume();
+        return read_string();
+    }
     if (std::isalpha(first_char) || first_char == chardefs::underscore)
     {
         return read_identifier();
@@ -64,7 +48,7 @@ token lexer::next_token()
         return next_token();
     }
 
-    // Not keyword nor literal, so look for separator
+    // Not keyword nor literal, so look for operator or separator
     switch (first_char)
     {
     case chardefs::plus:
@@ -127,6 +111,11 @@ token lexer::next_token()
             consume();
             return create_token(token_type::close_square);
         }
+    case chardefs::comma:
+        {
+            consume();
+            return create_token(token_type::comma);
+        }
     case chardefs::semicolon:
         {
             consume();
@@ -136,6 +125,69 @@ token lexer::next_token()
 
     // Could not identify the token
     return read_unknown();
+}
+
+token lexer::read_string()
+{
+    // TODO: Handle missing closing quote gracefully
+
+    while (current() != chardefs::quote && 
+           current() != chardefs::back_slash &&
+           current() != chardefs::eof)
+    {
+        consume();
+    }
+
+    char breaking_char = current();
+
+    switch (breaking_char)
+    {
+    case chardefs::quote:
+        {
+            consume();
+            break;
+        }
+    case chardefs::back_slash:
+        {
+            consume();
+            return read_escaped();
+        }
+    case chardefs::eof:
+        {
+            return create_token(token_type::invalid);
+        }
+    }
+
+    return create_token(token_type::string);
+}
+
+token lexer::read_escaped()
+{
+    char first_char = current();
+
+    // TODO: Handle octal and hex
+
+    switch (first_char)
+    {
+    case '\'':
+    case '\"':
+    case '\?':
+    case '\\':
+    case '\a':
+    case '\b':
+    case '\f':
+    case '\n':
+    case '\r':
+    case '\t':
+    case '\v':
+        {
+            consume();
+        }
+    }
+
+    // If no cases matched, ignore backslash
+
+    return read_string();
 }
 
 token lexer::read_identifier()
@@ -238,7 +290,7 @@ token lexer::read_float()
 
 token lexer::read_exponent()
 {
-    // Consume an optional + or - character
+    // Consume an optional '+' or '-' character
     if (current() == chardefs::plus || current() == chardefs::dash)
     {
         consume();
@@ -298,12 +350,4 @@ bool lexer::is_keyword() const
             text == keyworddefs::break_kw    ||
             text == keyworddefs::continue_kw ||
             text == keyworddefs::return_kw);
-}
-
-token lexer::create_token(token_type type)
-{
-    std::string text = buffer_.str();
-    buffer_.str(std::string());
-    buffer_.clear();
-    return token(type, token_start_, text);
 }

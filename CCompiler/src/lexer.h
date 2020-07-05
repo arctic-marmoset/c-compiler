@@ -2,6 +2,7 @@
 #define C_COMPILER_LEXER_H
 
 #include "token.h"
+#include "definitions.h"
 #include <sstream>
 #include <vector>
 
@@ -18,13 +19,28 @@ public:
     std::vector<token> lex_contents();
 
 private:
-    char current() const;
-    void next();
+    char current() const
+    {
+        if (index_ >= source_.size())
+        {
+            return chardefs::eof;
+        }
+        return source_[index_];
+    }
 
-    void consume();
+    void next() { index_++; }
+
+    void consume()
+    {
+        buffer_ << current();
+        next();
+    }
+
     void skip_space();
 
     token next_token();
+    token read_string();
+    token read_escaped();
     token read_identifier();
     token read_integer();
     token read_double();
@@ -34,7 +50,13 @@ private:
 
     bool is_keyword() const;
 
-    token create_token(token_type type);
+    token create_token(token_type type)
+    {
+        std::string text = buffer_.str();
+        buffer_.str(std::string());
+        buffer_.clear();
+        return token(type, token_start_, text);
+    }
 
 private:
     std::ostringstream buffer_;
