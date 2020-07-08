@@ -161,6 +161,9 @@
     <ClInclude Include="src\token.h" />
     <ClInclude Include="src\token_type.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="grammar\c_syntax.ebnf" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

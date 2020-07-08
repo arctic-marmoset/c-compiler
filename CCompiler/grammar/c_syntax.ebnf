@@ -1,0 +1,239 @@
+/*
+    This file acts as a reference for a context-free grammar approximating the ANSI C language.
+
+    The C language cannot be fully represented by a CFG due to the "typedef-name: identifier" problem.
+    See: https://eli.thegreenplace.net/2007/11/24/the-context-sensitivity-of-cs-grammar.
+
+    Adapted from https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm
+    to conform to the EBNF (Extended Backus–Naur form) used by W3C (https://www.w3.org/TR/xml/#sec-notation).
+*/
+
+TranslationUnit ::= ExternalDeclaration*
+
+ExternalDeclaration ::= FunctionDefinition
+                      | Declaration
+
+FunctionDefinition ::= DeclarationSpecifier* Declarator Declaration* CompoundStatement
+
+DeclarationSpecifier ::= StorageClassSpecifier
+                       | TypeSpecifier
+                       | TypeQualifier
+
+StorageClassSpecifier ::= "auto"
+                        | "register"
+                        | "static"
+                        | "extern"
+                        | "typedef"
+
+TypeSpecifier ::= "void"
+                | "char"
+                | "short"
+                | "int"
+                | "long"
+                | "float"
+                | "double"
+                | "signed"
+                | "unsigned"
+                | StructOrUnionSpecifier
+                | EnumSpecifier
+                | TypedefName
+
+StructOrUnionSpecifier ::= StructOrUnion Identifier "{" StructDeclaration+ "}"
+                         | StructOrUnion "{" StructDeclaration+ "}"
+                         | StructOrUnion Identifier
+
+StructOrUnion ::= "struct"
+                | "union"
+
+StructDeclaration ::= SpecifierQualifier* StructDeclaratorList
+
+SpecifierQualifier ::= TypeSpecifier
+                     | TypeQualifier
+
+StructDeclaratorList ::= StructDeclarator
+                       | StructDeclaratorList "," StructDeclarator
+
+StructDeclarator ::= Declarator
+                   | Declarator ":" ConstantExpression
+                   | ":" ConstantExpression
+
+Declarator ::= Pointer? DirectDeclarator
+
+Pointer ::= "*" TypeQualifier* Pointer?
+
+TypeQualifier ::= "const"
+                | "volatile"
+
+DirectDeclarator ::= Identifier
+                   | "(" Declarator ")"
+                   | DirectDeclarator "[" ConstantExpression? "]"
+                   | DirectDeclarator "(" ParameterTypeList ")"
+                   | DirectDeclarator "(" Identifier* ")"
+
+ConstantExpression ::= ConditionalExpression
+
+ConditionalExpression ::= LogicalOrExpression
+                        | LogicalOrExpression "?" Expression ":" ConditionalExpression
+
+LogicalOrExpression ::= LogicalAndExpression
+                      | LogicalOrExpression "||" LogicalAndExpression
+
+LogicalAndExpression ::= BitwiseOrExpression
+                       | LogicalAndExpression "&&" BitwiseOrExpression
+
+BitwiseOrExpression ::= BitwiseXorExpression
+                      | BitwiseOrExpression "|" BitwiseXorExpression
+
+BitwiseXorExpression ::= AndExpression
+                       | BitwiseXorExpression "^" AndExpression
+
+AndExpression ::= EqualityExpression
+                | AndExpression "&" EqualityExpression
+
+EqualityExpression ::= RelationalExpression
+                     | EqualityExpression "==" RelationalExpression
+                     | EqualityExpression "!=" RelationalExpression
+
+RelationalExpression ::= ShiftExpression
+                       | RelationalExpression "<" ShiftExpression
+                       | RelationalExpression ">" ShiftExpression
+                       | RelationalExpression "<=" ShiftExpression
+                       | RelationalExpression ">=" ShiftExpression
+
+ShiftExpression ::= AdditiveExpression
+                  | ShiftExpression "<<" AdditiveExpression
+                  | ShiftExpression ">>" AdditiveExpression
+
+AdditiveExpression ::= MultiplicativeExpression
+                     | AdditiveExpression "+" MultiplicativeExpression
+                     | AdditiveExpression "-" MultiplicativeExpression
+
+MultiplicativeExpression ::= CastExpression
+                           | MultiplicativeExpression "*" CastExpression
+                           | MultiplicativeExpression "/" CastExpression
+                           | MultiplicativeExpression "%" CastExpression
+
+CastExpression ::= UnaryExpression
+                 | "(" TypeName ")" CastExpression
+
+UnaryExpression ::= PostfixExpression
+                  | "++" UnaryExpression
+                  | "--" UnaryExpression
+                  | UnaryOperator CastExpression
+                  | "sizeof" UnaryExpression
+                  | "sizeof" TypeName
+
+PostfixExpression ::= PrimaryExpression
+                    | PostfixExpression "[" Expression "]"
+                    | PostfixExpression "(" AssignmentExpression* ")"
+                    | PostfixExpression "." Identifier
+                    | PostfixExpression "->" Identifier
+                    | PostfixExpression "++"
+                    | PostfixExpression "--"
+
+PrimaryExpression ::= Identifier
+                    | Constant
+                    | String
+                    | "(" Expression ")"
+
+Constant ::= IntegerConstant
+           | CharacterConstant
+           | FloatingConstant
+           | EnumerationConstant
+
+Expression ::= AssignmentExpression
+             | Expression "," AssignmentExpression
+
+AssignmentExpression ::= ConditionalExpression
+                       | UnaryExpression AssignmentOperator AssignmentExpression
+
+AssignmentOperator ::= "="
+                     | "*="
+                     | "/="
+                     | "%="
+                     | "+="
+                     | "-="
+                     | "<<="
+                     | ">>="
+                     | "&="
+                     | "^="
+                     | "|="
+
+UnaryOperator ::= "&"
+                | "*"
+                | "+"
+                | "-"
+                | "~"
+                | "!"
+
+TypeName ::= SpecifierQualifier+ AbstractDeclarator?
+
+ParameterTypeList ::= ParameterList
+                    | ParameterList "," "..."
+
+ParameterList ::= ParameterDeclaration
+                | ParameterList "," ParameterDeclaration
+
+ParameterDeclaration ::= DeclarationSpecifier+ Declarator
+                       | DeclarationSpecifier+ AbstractDeclarator
+                       | DeclarationSpecifier+
+
+AbstractDeclarator ::= Pointer
+                     | Pointer DirectAbstractDeclarator
+                     | DirectAbstractDeclarator
+
+DirectAbstractDeclarator ::= "(" AbstractDeclarator ")"
+                           | DirectAbstractDeclarator? "[" ConstantExpression? "]"
+                           | DirectAbstractDeclarator? "(" ParameterTypeList? ")"
+
+EnumSpecifier ::= "enum" Identifier "{" EnumeratorList "}"
+                | "enum" "{" EnumeratorList "}"
+                | "enum" Identifier
+
+EnumeratorList ::= Enumerator
+                  | EnumeratorList "," Enumerator
+
+Enumerator ::= Identifier
+             | Identifier "=" ConstantExpression
+
+TypedefName ::= Identifier
+
+Declaration ::= DeclarationSpecifier+ InitDeclarator* ";"
+
+InitDeclarator ::= Declarator
+                 | Declarator "=" Initializer
+
+Initializer ::= AssignmentExpression
+              | "{" InitializerList "}"
+              | "{" InitializerList "," "}"
+
+InitializerList ::= Initializer
+                  | InitializerList "," Initializer
+
+CompoundStatement ::= "{" Declaration* Statement* "}"
+
+Statement ::= LabeledStatement
+            | ExpressionStatement
+            | CompoundStatement
+            | SelectionStatement
+            | IterationStatement
+            | JumpStatement
+
+LabeledStatement ::= Identifier ":" Statement
+                   | "case" ConstantExpression ":" Statement
+                   | "default" ":" Statement
+
+ExpressionStatement ::= Expression? ";"
+
+SelectionStatement ::= "if" "(" Expression ")" Statement
+                     | "if" "(" Expression ")" Statement "else" Statement
+                     | "switch" "(" Expression ")" Statement
+
+IterationStatement ::= "while" "(" Expression ")" Statement
+                    | "do" Statement "while" "(" Expression ")" ";"
+                    | "for" "(" Expression? ";" Expression? ";" Expression? ")" Statement
+
+JumpStatement ::= "goto" Identifier ";"
+                | "continue" ";"
+                | "break" ";"
+                | "return" Expression? ";"
