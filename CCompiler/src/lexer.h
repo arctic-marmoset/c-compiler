@@ -9,7 +9,7 @@
 class lexer
 {
 public:
-    lexer(std::string_view text)
+    explicit lexer(const std::string_view text)
         : source_(text)
         , index_(0)
         , token_start_(0)
@@ -19,7 +19,7 @@ public:
     std::vector<token> lex_contents();
 
 private:
-    char current() const
+    [[nodiscard]] char current() const
     {
         if (index_ >= source_.size())
         {
@@ -48,11 +48,11 @@ private:
     token read_exponent();
     token read_unknown();
 
-    bool is_keyword() const;
+    [[nodiscard]] bool is_keyword() const;
 
-    token create_token(token_type type)
+    token create_token(const token_type type)
     {
-        std::string text = buffer_.str();
+        const std::string text = buffer_.str();
         buffer_.str(std::string());
         buffer_.clear();
         return token(type, token_start_, text);

@@ -8,7 +8,7 @@
 class token
 {
 public:
-    token(token_type type, std::size_t pos, std::string text)
+    token(const token_type type, const std::size_t pos, std::string text)
         : type(type)
         , text(std::move(text))
         , pos(pos)

@@ -6,7 +6,7 @@
 using namespace std::string_literals;
 
 // TODO: Clean up interactive console vs cmdline exec selection
-void run(std::string fileName);
+void run(const std::string &file_name);
 void run_debug();
 
 int main(int argc, char **argv)
@@ -40,13 +40,13 @@ void run_debug()
     }
 }
 
-void run(std::string fileName)
+void run(const std::string &file_name)
 {
-    auto in = std::ifstream(fileName, std::ios::in | std::ios::binary);
+    auto in = std::ifstream(file_name, std::ios::in | std::ios::binary);
 
     if (!in)
     {
-        std::cout << "Invalid filename \"" << fileName << "\"\n";
+        std::cout << "Invalid filename \"" << file_name << "\"\n";
         return;
     }
 
@@ -60,7 +60,7 @@ void run(std::string fileName)
     in.seekg(0, std::ios::end);
 
     // Get char position
-    auto count = static_cast<std::size_t>(in.tellg());
+    const auto count = static_cast<std::size_t>(in.tellg());
 
     // Construct a string with this size
     std::string source;

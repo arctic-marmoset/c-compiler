@@ -20,7 +20,7 @@ token lexer::next_token()
     token_start_ = index_;
 
     // Cache first char
-    char first_char = current();
+    const char first_char = current();
 
     // Nothing to lex if current() == eof
     if (first_char == chardefs::eof)
@@ -138,7 +138,7 @@ token lexer::read_string()
         consume();
     }
 
-    char breaking_char = current();
+    const char breaking_char = current();
 
     switch (breaking_char)
     {
@@ -163,7 +163,7 @@ token lexer::read_string()
 
 token lexer::read_escaped()
 {
-    char first_char = current();
+    const char first_char = current();
 
     // TODO: Handle octal and hex
 
@@ -219,7 +219,7 @@ token lexer::read_integer()
     }
 
     // A non-digit char was hit
-    char breaking_char = current();
+    const char breaking_char = current();
 
     // Handle special cases
     switch (breaking_char)
@@ -257,7 +257,7 @@ token lexer::read_double()
     }
 
     // A non-digit char was hit
-    char breaking_char = current();
+    const char breaking_char = current();
 
     // Handle special cases
     switch (breaking_char)
@@ -331,7 +331,7 @@ token lexer::read_unknown()
 bool lexer::is_keyword() const
 {
     // TODO: Maybe automate this
-    std::string text = buffer_.str();
+    const std::string text = buffer_.str();
     return (text == keyworddefs::char_kw     ||
             text == keyworddefs::int_kw      ||
             text == keyworddefs::double_kw   ||
