@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="src\definitions.h" />
     <ClInclude Include="src\lexer.h" />
+    <ClInclude Include="src\parser.h" />
     <ClInclude Include="src\token.h" />
     <ClInclude Include="src\token_type.h" />
   </ItemGroup>

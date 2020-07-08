@@ -35,5 +35,8 @@
     <ClInclude Include="src\definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
