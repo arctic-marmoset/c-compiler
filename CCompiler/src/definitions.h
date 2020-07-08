@@ -5,27 +5,27 @@
 
 namespace keyworddefs
 {
-    inline constexpr std::string_view char_kw   = "char";
-    inline constexpr std::string_view int_kw    = "int";
-    inline constexpr std::string_view double_kw = "double";
-    inline constexpr std::string_view float_kw  = "float";
-    inline constexpr std::string_view struct_kw = "struct";
-    inline constexpr std::string_view enum_kw   = "enum";
-    inline constexpr std::string_view void_kw   = "void";
-    inline constexpr std::string_view short_kw  = "short";
-    inline constexpr std::string_view long_kw   = "long";
+    inline constexpr std::string_view char_keyword   = "char";
+    inline constexpr std::string_view int_keyword    = "int";
+    inline constexpr std::string_view double_keyword = "double";
+    inline constexpr std::string_view float_keyword  = "float";
+    inline constexpr std::string_view struct_keyword = "struct";
+    inline constexpr std::string_view enum_keyword   = "enum";
+    inline constexpr std::string_view void_keyword   = "void";
+    inline constexpr std::string_view short_keyword  = "short";
+    inline constexpr std::string_view long_keyword   = "long";
 
-    inline constexpr std::string_view const_kw  = "const";
-    inline constexpr std::string_view static_kw = "static";
+    inline constexpr std::string_view const_keyword  = "const";
+    inline constexpr std::string_view static_keyword = "static";
 
-    inline constexpr std::string_view if_kw       = "if";
-    inline constexpr std::string_view else_kw     = "else";
-    inline constexpr std::string_view for_kw      = "for";
-    inline constexpr std::string_view while_kw    = "while";
-    inline constexpr std::string_view break_kw    = "break";
-    inline constexpr std::string_view continue_kw = "continue";
+    inline constexpr std::string_view if_keyword       = "if";
+    inline constexpr std::string_view else_keyword     = "else";
+    inline constexpr std::string_view for_keyword      = "for";
+    inline constexpr std::string_view while_keyword    = "while";
+    inline constexpr std::string_view break_keyword    = "break";
+    inline constexpr std::string_view continue_keyword = "continue";
 
-    inline constexpr std::string_view return_kw = "return";
+    inline constexpr std::string_view return_keyword = "return";
 }
 
 namespace chardefs
@@ -58,7 +58,7 @@ namespace chardefs
 
     inline constexpr char apostrophe = '\'';
     inline constexpr char quote      = '\"';
-    inline constexpr char back_slash = '\\';
+    inline constexpr char backslash  = '\\';
 
     inline constexpr char question = '?';
     inline constexpr char colon    = ':';

@@ -132,7 +132,7 @@ token lexer::read_string()
     // TODO: Handle missing closing quote gracefully
 
     while (current() != chardefs::quote && 
-           current() != chardefs::back_slash &&
+           current() != chardefs::backslash &&
            current() != chardefs::eof)
     {
         consume();
@@ -147,7 +147,7 @@ token lexer::read_string()
             consume();
             break;
         }
-    case chardefs::back_slash:
+    case chardefs::backslash:
         {
             consume();
             return read_escaped();
@@ -332,22 +332,22 @@ bool lexer::is_keyword() const
 {
     // TODO: Maybe automate this
     const std::string text = buffer_.str();
-    return (text == keyworddefs::char_kw     ||
-            text == keyworddefs::int_kw      ||
-            text == keyworddefs::double_kw   ||
-            text == keyworddefs::float_kw    ||
-            text == keyworddefs::struct_kw   ||
-            text == keyworddefs::enum_kw     ||
-            text == keyworddefs::void_kw     ||
-            text == keyworddefs::short_kw    ||
-            text == keyworddefs::long_kw     ||
-            text == keyworddefs::const_kw    ||
-            text == keyworddefs::static_kw   ||
-            text == keyworddefs::if_kw       ||
-            text == keyworddefs::else_kw     ||
-            text == keyworddefs::for_kw      ||
-            text == keyworddefs::while_kw    ||
-            text == keyworddefs::break_kw    ||
-            text == keyworddefs::continue_kw ||
-            text == keyworddefs::return_kw);
+    return (text == keyworddefs::char_keyword     ||
+            text == keyworddefs::int_keyword      ||
+            text == keyworddefs::double_keyword   ||
+            text == keyworddefs::float_keyword    ||
+            text == keyworddefs::struct_keyword   ||
+            text == keyworddefs::enum_keyword     ||
+            text == keyworddefs::void_keyword     ||
+            text == keyworddefs::short_keyword    ||
+            text == keyworddefs::long_keyword     ||
+            text == keyworddefs::const_keyword    ||
+            text == keyworddefs::static_keyword   ||
+            text == keyworddefs::if_keyword       ||
+            text == keyworddefs::else_keyword     ||
+            text == keyworddefs::for_keyword      ||
+            text == keyworddefs::while_keyword    ||
+            text == keyworddefs::break_keyword    ||
+            text == keyworddefs::continue_keyword ||
+            text == keyworddefs::return_keyword);
 }
