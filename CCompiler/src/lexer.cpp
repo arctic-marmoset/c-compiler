@@ -321,7 +321,7 @@ token lexer::read_exponent()
 
 token lexer::read_unknown()
 {
-    while (!std::isspace(current()) && !current() == chardefs::eof)
+    while (!std::isspace(current()) && current() != chardefs::eof)
     {
         consume();
     }
