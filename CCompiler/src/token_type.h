@@ -6,23 +6,21 @@
 
 enum class token_type
 {
-    integer = 0,
-    double_precision,
-    single_precision,
+    integer_literal = 0,
+    double_literal,
+    float_literal,
+    string_literal,
 
-    string,
     keyword,
-    modifier,
     identifier,
-    
-    assign,
-    
+
     plus,
     minus,
     asterisk,
     forward_slash,
     mod,
 
+    assign,
     plus_assign,
     minus_assign,
     times_assign,
@@ -31,16 +29,12 @@ enum class token_type
 
     increment,
     decrement,
-    
-    equals,
-    not_equals,
-    greater_than,
-    less_than,
-    
-    bit_or,
-    bit_and,
-    bit_not,
-    bit_xor,
+
+    bitwise_or,
+    bitwise_and,
+    bitwise_not,
+    bitwise_xor,
+
     left_shift,
     right_shift,
 
@@ -48,8 +42,13 @@ enum class token_type
     logical_and,
     logical_not,
 
-    open_paren,
-    close_paren,
+    comparison_equals,
+    comparison_not_equals,
+    greater_than,
+    less_than,
+
+    open_parenthesis,
+    close_parenthesis,
     open_brace,
     close_brace,
     open_angle,

@@ -12,14 +12,16 @@ public:
     explicit lexer(const std::string_view text)
         : source_(text)
         , index_(0)
-        , token_start_(0)
+        , line_(0)
+        , column_(1)
+        , start_column_(column_)
     {
     }
 
     std::vector<token> lex_contents();
 
 private:
-    [[nodiscard]] char current() const
+    char current() const
     {
         if (index_ >= source_.size())
         {
@@ -28,12 +30,25 @@ private:
         return source_[index_];
     }
 
-    void next() { index_++; }
+    void advance()
+    {
+        index_++;
+        column_++;
+    }
 
     void consume()
     {
         buffer_ << current();
-        next();
+        advance();
+    }
+
+    // TODO: This naively assumes newline == \r\n
+    void read_newline()
+    {
+        advance();
+        advance();
+        line_++;
+        column_ = 1;
     }
 
     void skip_space();
@@ -48,14 +63,14 @@ private:
     token read_exponent();
     token read_unknown();
 
-    [[nodiscard]] bool is_keyword() const;
+    bool is_keyword() const;
 
     token create_token(const token_type type)
     {
         const std::string text = buffer_.str();
         buffer_.str(std::string());
         buffer_.clear();
-        return token(type, token_start_, text);
+        return token(type, line_, start_column_, text);
     }
 
 private:
@@ -64,8 +79,9 @@ private:
     // TODO: Should this be an std::string instead?
     std::string_view source_;
     std::size_t index_;
-
-    std::size_t token_start_;
+    std::size_t line_;
+    std::size_t column_;
+    std::size_t start_column_;
 };
 
 #endif // !C_COMPILER_LEXER_H

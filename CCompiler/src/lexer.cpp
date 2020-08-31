@@ -1,5 +1,4 @@
 #include "lexer.h"
-
 #include <cctype>
 
 std::vector<token> lexer::lex_contents()
@@ -16,11 +15,18 @@ std::vector<token> lexer::lex_contents()
 
 token lexer::next_token()
 {
-    // Cache starting index of token
-    token_start_ = index_;
+    // Cache starting column of token
+    start_column_ = column_;
 
     // Cache first char
     const char first_char = current();
+
+    // Handle newline
+    if (first_char == chardefs::cr)
+    {
+        read_newline();
+        return next_token();
+    }
 
     // Nothing to lex if current() == eof
     if (first_char == chardefs::eof)
@@ -74,12 +80,12 @@ token lexer::next_token()
     case chardefs::open_paren:
         {
             consume();
-            return create_token(token_type::open_paren);
+            return create_token(token_type::open_parenthesis);
         }
     case chardefs::close_paren:
         {
             consume();
-            return create_token(token_type::close_paren);
+            return create_token(token_type::close_parenthesis);
         }
     case chardefs::open_brace:
         {
@@ -121,6 +127,8 @@ token lexer::next_token()
             consume();
             return create_token(token_type::semicolon);
         }
+    default:
+        break;
     }
 
     // Could not identify the token
@@ -131,7 +139,7 @@ token lexer::read_string()
 {
     // TODO: Handle missing closing quote gracefully
 
-    while (current() != chardefs::quote && 
+    while (current() != chardefs::quote &&
            current() != chardefs::backslash &&
            current() != chardefs::eof)
     {
@@ -158,7 +166,7 @@ token lexer::read_string()
         }
     }
 
-    return create_token(token_type::string);
+    return create_token(token_type::string_literal);
 }
 
 token lexer::read_escaped()
@@ -180,9 +188,7 @@ token lexer::read_escaped()
     case '\r':
     case '\t':
     case '\v':
-        {
-            consume();
-        }
+        consume();
     }
 
     // If no cases matched, ignore backslash
@@ -207,7 +213,7 @@ void lexer::skip_space()
 {
     while (std::isspace(current()))
     {
-        next();
+        advance();
     }
 }
 
@@ -236,7 +242,7 @@ token lexer::read_integer()
         }
     }
 
-    return create_token(token_type::integer);
+    return create_token(token_type::integer_literal);
 }
 
 token lexer::read_double()
@@ -278,14 +284,14 @@ token lexer::read_double()
         }
     }
 
-    return create_token(token_type::double_precision);
+    return create_token(token_type::double_literal);
 }
 
 token lexer::read_float()
 {
     // This method is only called when current() == 'f',
     // at which point the float token is complete.
-    return create_token(token_type::single_precision);
+    return create_token(token_type::float_literal);
 }
 
 token lexer::read_exponent()
@@ -303,7 +309,7 @@ token lexer::read_exponent()
         consume();
     }
 
-    // An exponent must have a value
+    // An exponent must have at least 1 digit
     if (exponent_length == 0)
     {
         return read_unknown();
@@ -316,7 +322,7 @@ token lexer::read_exponent()
         return read_float();
     }
 
-    return create_token(token_type::double_precision);
+    return create_token(token_type::double_literal);
 }
 
 token lexer::read_unknown()
