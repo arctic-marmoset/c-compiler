@@ -2,10 +2,10 @@
 #include "parser.h"
 #include <algorithm>
 #include <fstream>
-
-using namespace std::string_literals;
+#include <iomanip>
 
 // TODO: Clean up interactive console vs cmdline exec selection
+// TODO: Remove code duplication between run and run_debug
 void run(const std::string &file_name);
 void run_debug();
 
@@ -31,12 +31,33 @@ void run_debug()
             break;
         }
 
-        lexer lex = lexer(source);
+        auto lex = lexer(source);
         auto tokens = lex.lex_contents();
+        std::cout << "== TOKENS ==" << "\n\n";
         for (const auto &token : tokens)
         {
-            std::cout << token.type << ": " << token.text << "\n";
+            std::cout << std::left << std::setw(8)  << token.pos.to_string()
+                                   << std::setw(5)  << token.type
+                                   << std::setw(20) << token.text << '\n';
         }
+        std::cout << '\n';
+
+        auto par = parser(tokens);
+
+        std::shared_ptr<syntax_node> root;
+        try
+        {
+            root = par.parse_contents();
+        }
+        catch (std::runtime_error &ex)
+        {
+            std::cout << "Error: " << ex.what() << '\n';
+            continue;
+        }
+
+        std::cout << "== AST ==" << "\n\n";
+        std::cout << root->tree_representation();
+        std::cout << '\n';
     }
 }
 
@@ -46,7 +67,7 @@ void run(const std::string &file_name)
 
     if (!in)
     {
-        std::cout << "Invalid filename \"" << file_name << "\"\n";
+        std::cout << "Invalid filename \"" << file_name <<"\"" "\n";
         return;
     }
 
@@ -73,10 +94,32 @@ void run(const std::string &file_name)
     in.read(source.data(), source.size());
     in.close();
 
-    lexer lex = lexer(source);
+    auto lex = lexer(source);
     auto tokens = lex.lex_contents();
+
+    std::cout << "== TOKENS ==" << "\n\n";
     for (const auto &token : tokens)
     {
-        std::cout << token.type << ": " << token.text << "\n";
+        std::cout << std::left << std::setw(8)  << token.pos.to_string()
+                               << std::setw(5)  << token.type
+                               << std::setw(20) << token.text << '\n';
     }
+    std::cout << '\n';
+
+    auto par = parser(tokens);
+
+    std::shared_ptr<syntax_node> root;
+    try
+    {
+        root = par.parse_contents();
+    }
+    catch (std::runtime_error &ex)
+    {
+        std::cout << "Error: " << ex.what() << '\n';
+        return;
+    }
+
+    std::cout << "== AST ==" << "\n\n";
+    std::cout << root->tree_representation();
+    std::cout << '\n';
 }
