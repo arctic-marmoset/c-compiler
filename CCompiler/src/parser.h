@@ -2,6 +2,7 @@
 #define C_COMPILER_PARSER_H
 
 #include "syntax/literal.h"
+#include "syntax/statement.h"
 #include "syntax/syntax_node.h"
 #include "token.h"
 #include <vector>
@@ -18,17 +19,9 @@ public:
     {
     }
 
-    // TODO: This is a dummy function
     std::unique_ptr<syntax_node> parse_contents()
     {
-        if (match(token_type::integer_literal))
-        {
-            return std::make_unique<integer_literal>(current_token());
-        }
-        else
-        {
-            throw std::runtime_error("Expected an integer literal");
-        }
+        return parse_return_statement();
     }
 
 private:
@@ -39,7 +32,37 @@ private:
 
     void advance()
     {
-        index_++;
+        if (index_ + 1 < tokens_.get().size())
+        {
+            index_++;
+        }
+    }
+
+    std::unique_ptr<return_statement> parse_return_statement()
+    {
+        const auto &current = current_token();
+        if (!match(token_type::keyword) || current.text != "return")
+        {
+            throw std::runtime_error("Expected a 'return' keyword");
+        }
+        auto ret_statement = std::make_unique<return_statement>(current);
+        advance();
+
+        if (match(token_type::integer_literal))
+        {
+            ret_statement->set_expression(
+                std::make_unique<integer_literal>(current_token())
+            );
+            advance();
+        }
+
+        if (!match(token_type::semicolon))
+        {
+            throw std::runtime_error("Expected a ';'");
+        }
+        advance();
+
+        return ret_statement;
     }
 
     /// <summary>

@@ -6,8 +6,8 @@
 class integer_literal : public syntax_node
 {
 public:
-    integer_literal(const token &underlying_token)
-        : syntax_node(underlying_token)
+    explicit integer_literal(const token &trigger_token)
+        : syntax_node(trigger_token)
     {
     }
 

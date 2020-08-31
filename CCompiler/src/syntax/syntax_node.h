@@ -7,6 +7,7 @@
 enum class syntax_type
 {
     integer_literal,
+    return_statement,
 };
 
 class syntax_node
