@@ -38,6 +38,10 @@ namespace chardefs
     inline constexpr char dash          = '-';
     inline constexpr char asterisk      = '*';
     inline constexpr char forward_slash = '/';
+    inline constexpr char back_slash    = '\\';
+
+    inline constexpr char single_quote  = '\'';
+    inline constexpr char double_quote  = '"';
 
     inline constexpr char pipe          = '|';
     inline constexpr char ampersand     = '&';

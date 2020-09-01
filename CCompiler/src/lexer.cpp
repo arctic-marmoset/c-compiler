@@ -199,10 +199,10 @@ token lexer::read_escaped()
 
     switch (first_char)
     {
-    case '\'':
-    case '\"':
-    case '?':
-    case '\\':
+    case chardefs::single_quote:
+    case chardefs::double_quote:
+    case chardefs::question:
+    case chardefs::back_slash:
     case 'a':
     case 'b':
     case 'f':
@@ -211,16 +211,16 @@ token lexer::read_escaped()
     case 't':
     case 'v':
         {
-            buffer_ << '\\';
+            buffer_ << chardefs::back_slash;
             consume();
             break;
         }
-    case '\r':
+    case chardefs::cr:
         {
             advance();
             return read_escaped();
         }
-    case '\n':
+    case chardefs::lf:
         {
             handle_newline();
             break;
