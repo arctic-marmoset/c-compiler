@@ -65,11 +65,12 @@ private:
         return ret_statement;
     }
 
-    /// <summary>
-    /// Matches the current token against a single `token_type`.
-    /// </summary>
-    /// <param name="first">The `token_type` to match.</param>
-    /// <returns>`true` if matches. `false` otherwise.</returns>
+    /**
+     * @brief Matches the current token against a single `token_type`.
+     *
+     * @param[in] first The `token_type` to match.
+     * @return          `true` if matches. `false` otherwise.
+     */
     bool match(const token_type &first) const
     {
         return current_token().type == first;
@@ -78,12 +79,13 @@ private:
     template <typename... Ts>
     using are_token_types = std::conjunction<std::is_same<Ts, token_type>...>;
 
-    /// <summary>
-    /// Matches the current token against a variable number of `token_type` arguments.
-    /// </summary>
-    /// <param name="first">The first token to match.</param>
-    /// <param name="rest">The remaining tokens to match.</param>
-    /// <returns>`true` if at least one of the arguments matches. `false` otherwise.</returns>
+    /**
+     * @brief Matches the current token against a variable number of `token_type` arguments.
+     *
+     * @param[in] first The first token to match.
+     * @param[in] rest  The remaining tokens to match.
+     * @return    `true` if at least one of the arguments matches. `false` otherwise.
+     */
     template <typename... Args, typename = std::enable_if_t<are_token_types<Args...>::value>>
     bool match(const token_type &first, const Args &... rest) const
     {
