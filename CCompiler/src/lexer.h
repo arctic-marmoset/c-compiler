@@ -1,8 +1,8 @@
 #ifndef C_COMPILER_LEXER_H
 #define C_COMPILER_LEXER_H
 
-#include "token.h"
 #include "definitions.h"
+#include "token.h"
 #include <sstream>
 #include <vector>
 

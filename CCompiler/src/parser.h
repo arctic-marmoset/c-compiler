@@ -59,12 +59,6 @@ private:
         return matched;
     }
 
-    std::unique_ptr<primary_expression> parse_literal();
-    std::unique_ptr<parenthesized_expression> parse_parenthesized_expression();
-    std::unique_ptr<primary_expression> parse_primary_expression();
-    std::unique_ptr<return_statement> parse_return_statement();
-    std::unique_ptr<compound_statement> parse_compound_statement();
-
     /**
      * @brief Matches the current token against a single `token_type`.
      *
@@ -91,6 +85,12 @@ private:
     {
         return match(first) || match(rest...);
     }
+
+    std::unique_ptr<primary_expression>       parse_literal();
+    std::unique_ptr<parenthesized_expression> parse_parenthesized_expression();
+    std::unique_ptr<primary_expression>       parse_primary_expression();
+    std::unique_ptr<return_statement>         parse_return_statement();
+    std::unique_ptr<compound_statement>       parse_compound_statement();
 
 private:
     std::size_t index_;
