@@ -4,12 +4,10 @@ std::unique_ptr<primary_expression> parser::parse_literal()
 {
     const auto &current = current_token();
 
-    if (!match(
-        token_type::integer_literal,
-        token_type::double_literal,
-        token_type::float_literal,
-        token_type::string_literal
-    ))
+    if (!match(token_type::integer_literal,
+               token_type::double_literal,
+               token_type::float_literal,
+               token_type::string_literal))
     {
         throw std::runtime_error("Expected a literal");
     }
