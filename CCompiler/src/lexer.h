@@ -12,7 +12,7 @@ public:
     explicit lexer(const std::string_view text)
         : source_(text)
         , index_(0)
-        , line_(0)
+        , line_(1)
         , column_(1)
         , start_column_(column_)
     {

@@ -374,8 +374,6 @@ token lexer::read_unknown()
 
 // TODO: Is there a better place to put this?
 
-using namespace std::string_view_literals;
-
 static const std::unordered_map<std::string_view, token_type> keyword_types =
 {
     { keyworddefs::char_keyword,     token_type::char_keyword     },
