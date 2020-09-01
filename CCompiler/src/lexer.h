@@ -42,7 +42,6 @@ private:
         advance();
     }
 
-    // TODO: This naively assumes newline == \r\n
     void handle_newline()
     {
         advance();
