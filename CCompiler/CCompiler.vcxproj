@@ -163,7 +163,7 @@
     <ClInclude Include="src\definitions.h" />
     <ClInclude Include="src\lexer.h" />
     <ClInclude Include="src\parser.h" />
-    <ClInclude Include="src\syntax\literal.h" />
+    <ClInclude Include="src\syntax\expression.h" />
     <ClInclude Include="src\syntax\statement.h" />
     <ClInclude Include="src\syntax\syntax_node.h" />
     <ClInclude Include="src\token.h" />

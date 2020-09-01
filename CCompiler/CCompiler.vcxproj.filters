@@ -44,10 +44,10 @@
     <ClInclude Include="src\syntax\syntax_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\syntax\literal.h">
+    <ClInclude Include="src\syntax\statement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\syntax\statement.h">
+    <ClInclude Include="src\syntax\expression.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

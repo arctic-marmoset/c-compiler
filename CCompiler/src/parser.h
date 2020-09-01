@@ -1,7 +1,7 @@
 #ifndef C_COMPILER_PARSER_H
 #define C_COMPILER_PARSER_H
 
-#include "syntax/literal.h"
+#include "syntax/expression.h"
 #include "syntax/statement.h"
 #include "syntax/syntax_node.h"
 #include "token.h"
@@ -23,7 +23,7 @@ public:
 
     std::unique_ptr<syntax_node> parse_contents()
     {
-        return parse_return_statement();
+        return parse_compound_statement();
     }
 
 private:
@@ -40,32 +40,30 @@ private:
         }
     }
 
-    std::unique_ptr<return_statement> parse_return_statement()
+    /**
+     * @brief Asserts that the current token is of the specified `type`,
+     *        and advances to the next token if true.
+     *
+     * @param[in] type The type that the current token should match.
+     * @return         `true` if the assertion passed. `false` otherwise.
+     */
+    bool expect(token_type type)
     {
-        const auto &current = current_token();
-        if (!match(token_type::return_keyword))
-        {
-            throw std::runtime_error("Expected a 'return' keyword");
-        }
-        auto ret_statement = std::make_unique<return_statement>(current);
-        advance();
+        const bool matched = match(type);
 
-        if (match(token_type::integer_literal))
+        if (matched)
         {
-            ret_statement->set_expression(
-                std::make_unique<integer_literal>(current_token())
-            );
             advance();
         }
 
-        if (!match(token_type::semicolon))
-        {
-            throw std::runtime_error("Expected a ';'");
-        }
-        advance();
-
-        return ret_statement;
+        return matched;
     }
+
+    std::unique_ptr<primary_expression> parse_literal();
+    std::unique_ptr<parenthesized_expression> parse_parenthesized_expression();
+    std::unique_ptr<primary_expression> parse_primary_expression();
+    std::unique_ptr<return_statement> parse_return_statement();
+    std::unique_ptr<compound_statement> parse_compound_statement();
 
     /**
      * @brief Matches the current token against a single `token_type`.
@@ -91,7 +89,7 @@ private:
     template <typename... Args, typename = std::enable_if_t<are_token_types<Args...>::value>>
     bool match(const token_type &first, const Args &... rest) const
     {
-        return match(first) && match(rest...);
+        return match(first) || match(rest...);
     }
 
 private:

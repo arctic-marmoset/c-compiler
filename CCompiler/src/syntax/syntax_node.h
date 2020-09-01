@@ -6,8 +6,14 @@
 
 enum class syntax_type
 {
-    integer_literal,
+    integer_literal = 0,
+    double_literal,
+    float_literal,
+    string_literal,
+    binary_expression,
+    parenthesized_expression,
     return_statement,
+    compound_statement,
 };
 
 class syntax_node
@@ -38,12 +44,17 @@ public:
 
     source_position source_position() const
     {
-        return trigger_token_.get().pos;
+        return trigger_token().pos;
     }
 
     const std::vector<syntax_node *> &children() const
     {
         return children_;
+    }
+
+    const token &trigger_token() const
+    {
+        return trigger_token_;
     }
 
     /**
