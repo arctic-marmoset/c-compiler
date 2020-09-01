@@ -18,15 +18,11 @@ public:
 
     std::string to_string() const override
     {
-        std::ostringstream ss;
-
         const auto &[_, text, pos] = trigger_token_.get();
 
-        ss << "integer_literal"         " "
-            + pos.to_string("<", ">") + " "
-            "'int'" " " + text;
-
-        return ss.str();
+        return "integer_literal"           " "
+               + pos.to_string("<", ">") + " "
+               "'int'" " " + text;
     }
 };
 

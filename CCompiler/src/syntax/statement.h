@@ -27,14 +27,10 @@ public:
 
     std::string to_string() const override
     {
-        std::ostringstream ss;
-
         const auto &pos = trigger_token_.get().pos;
 
-        ss << "return_statement"   " " 
-            + pos.to_string("<", ">");
-
-        return ss.str();
+        return "return_statement"     " " 
+               + pos.to_string("<", ">");
     }
 
 private:
