@@ -1,5 +1,6 @@
 #include "lexer.h"
 #include <cctype>
+#include <unordered_map>
 
 std::vector<token> lexer::lex_contents()
 {
@@ -21,10 +22,16 @@ token lexer::next_token()
     // Cache first char
     const char first_char = current();
 
-    // Handle newline
+    // Skip CR since no modern OS uses CR for newline
     if (first_char == chardefs::cr)
     {
-        read_newline();
+        advance();
+        return next_token();
+    }
+
+    if (first_char == chardefs::lf)
+    {
+        handle_newline();
         return next_token();
     }
 
@@ -137,10 +144,12 @@ token lexer::next_token()
 
 token lexer::read_string()
 {
-    // TODO: Handle missing closing quote gracefully
+    // TODO: Report missing closing quote as error
 
     while (current() != chardefs::quote &&
            current() != chardefs::backslash &&
+           current() != chardefs::cr &&
+           current() != chardefs::lf &&
            current() != chardefs::eof)
     {
         consume();
@@ -150,6 +159,16 @@ token lexer::read_string()
 
     switch (breaking_char)
     {
+    case chardefs::cr:
+        {
+            advance();
+            return read_string();
+        }
+    case chardefs::lf:
+        {
+            handle_newline();
+            break;
+        }
     case chardefs::quote:
         {
             consume();
@@ -157,12 +176,11 @@ token lexer::read_string()
         }
     case chardefs::backslash:
         {
-            consume();
             return read_escaped();
         }
     case chardefs::eof:
         {
-            return create_token(token_type::invalid);
+            return create_token(token_type::unknown);
         }
     }
 
@@ -171,6 +189,10 @@ token lexer::read_string()
 
 token lexer::read_escaped()
 {
+    // Skip the backslash for now. We will determine
+    // whether it should be part of the string later.
+    advance();
+
     const char first_char = current();
 
     // TODO: Handle octal and hex
@@ -179,16 +201,30 @@ token lexer::read_escaped()
     {
     case '\'':
     case '\"':
-    case '\?':
+    case '?':
     case '\\':
-    case '\a':
-    case '\b':
-    case '\f':
-    case '\n':
+    case 'a':
+    case 'b':
+    case 'f':
+    case 'n':
+    case 'r':
+    case 't':
+    case 'v':
+        {
+            buffer_ << '\\';
+            consume();
+            break;
+        }
     case '\r':
-    case '\t':
-    case '\v':
-        consume();
+        {
+            advance();
+            return read_escaped();
+        }
+    case '\n':
+        {
+            handle_newline();
+            break;
+        }
     }
 
     // If no cases matched, ignore backslash
@@ -202,10 +238,12 @@ token lexer::read_identifier()
     {
         consume();
     }
-    if (is_keyword())
+
+    if (const auto type = get_keyword_type(); type != token_type::unknown)
     {
-        return create_token(token_type::keyword);
+        return create_token(type);
     }
+
     return create_token(token_type::identifier);
 }
 
@@ -331,29 +369,45 @@ token lexer::read_unknown()
     {
         consume();
     }
-    return create_token(token_type::invalid);
+    return create_token(token_type::unknown);
 }
 
-bool lexer::is_keyword() const
+// TODO: Is there a better place to put this?
+
+using namespace std::string_view_literals;
+
+static const std::unordered_map<std::string_view, token_type> keyword_types =
 {
-    // TODO: Maybe automate this
+    { keyworddefs::char_keyword,     token_type::char_keyword     },
+    { keyworddefs::int_keyword,      token_type::int_keyword      },
+    { keyworddefs::double_keyword,   token_type::double_keyword   },
+    { keyworddefs::float_keyword,    token_type::float_keyword    },
+    { keyworddefs::struct_keyword,   token_type::struct_keyword   },
+    { keyworddefs::enum_keyword,     token_type::enum_keyword     },
+    { keyworddefs::void_keyword,     token_type::void_keyword     },
+    { keyworddefs::short_keyword,    token_type::short_keyword    },
+    { keyworddefs::long_keyword,     token_type::long_keyword     },
+    { keyworddefs::const_keyword,    token_type::const_keyword    },
+    { keyworddefs::static_keyword,   token_type::static_keyword   },
+    { keyworddefs::if_keyword,       token_type::if_keyword       },
+    { keyworddefs::else_keyword,     token_type::else_keyword     },
+    { keyworddefs::for_keyword,      token_type::for_keyword      },
+    { keyworddefs::while_keyword,    token_type::while_keyword    },
+    { keyworddefs::break_keyword,    token_type::break_keyword    },
+    { keyworddefs::continue_keyword, token_type::continue_keyword },
+    { keyworddefs::return_keyword,   token_type::return_keyword   },
+};
+
+token_type lexer::get_keyword_type() const
+{
     const std::string text = buffer_.str();
-    return (text == keyworddefs::char_keyword     ||
-            text == keyworddefs::int_keyword      ||
-            text == keyworddefs::double_keyword   ||
-            text == keyworddefs::float_keyword    ||
-            text == keyworddefs::struct_keyword   ||
-            text == keyworddefs::enum_keyword     ||
-            text == keyworddefs::void_keyword     ||
-            text == keyworddefs::short_keyword    ||
-            text == keyworddefs::long_keyword     ||
-            text == keyworddefs::const_keyword    ||
-            text == keyworddefs::static_keyword   ||
-            text == keyworddefs::if_keyword       ||
-            text == keyworddefs::else_keyword     ||
-            text == keyworddefs::for_keyword      ||
-            text == keyworddefs::while_keyword    ||
-            text == keyworddefs::break_keyword    ||
-            text == keyworddefs::continue_keyword ||
-            text == keyworddefs::return_keyword);
+
+    if (const auto it = keyword_types.find(text); it != keyword_types.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        return token_type::unknown;
+    }
 }

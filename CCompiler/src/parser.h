@@ -7,6 +7,8 @@
 #include "token.h"
 #include <vector>
 
+// TODO: Implement better error handling and reporting
+
 class parser
 {
     template <typename T>
@@ -41,7 +43,7 @@ private:
     std::unique_ptr<return_statement> parse_return_statement()
     {
         const auto &current = current_token();
-        if (!match(token_type::keyword) || current.text != "return")
+        if (!match(token_type::return_keyword))
         {
             throw std::runtime_error("Expected a 'return' keyword");
         }

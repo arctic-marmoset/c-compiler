@@ -43,9 +43,8 @@ private:
     }
 
     // TODO: This naively assumes newline == \r\n
-    void read_newline()
+    void handle_newline()
     {
-        advance();
         advance();
         line_++;
         column_ = 1;
@@ -63,7 +62,7 @@ private:
     token read_exponent();
     token read_unknown();
 
-    bool is_keyword() const;
+    token_type get_keyword_type() const;
 
     token create_token(const token_type type)
     {

@@ -11,7 +11,25 @@ enum class token_type
     float_literal,
     string_literal,
 
-    keyword,
+    char_keyword,
+    int_keyword,
+    double_keyword,
+    float_keyword,
+    struct_keyword,
+    enum_keyword,
+    void_keyword,
+    short_keyword,
+    long_keyword,
+    const_keyword,
+    static_keyword,
+    if_keyword,
+    else_keyword,
+    for_keyword,
+    while_keyword,
+    break_keyword,
+    continue_keyword,
+    return_keyword,
+
     identifier,
 
     plus,
@@ -60,7 +78,7 @@ enum class token_type
 
     eof,
 
-    invalid
+    unknown
 };
 
 inline std::ostream &operator<<(std::ostream &os, token_type type)
