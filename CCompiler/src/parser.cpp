@@ -3,10 +3,12 @@
 #include "syntax/binary_expression.h"
 #include "syntax/compound_statement.h"
 #include "syntax/declaration_reference_expression.h"
+#include "syntax/function_declaration.h"
 #include "syntax/literal.h"
 #include "syntax/parenthesized_expression.h"
 #include "syntax/primary_expression.h"
 #include "syntax/return_statement.h"
+#include "syntax/translation_unit_declaration.h"
 #include "syntax/variable_declaration.h"
 
 std::unique_ptr<primary_expression> parser::parse_literal()
@@ -137,32 +139,29 @@ std::unique_ptr<compound_statement> parser::parse_compound_statement()
 
     auto statements = std::make_unique<compound_statement>(start);
 
+    bool has_return_statement = false;
+
     while (!consume(token_type::close_brace))
     {
+        auto statement = parse_statement();
+
+        if (statement->type() == syntax_type::return_statement)
+        {
+            has_return_statement = true;
+        }
+
         statements->add_statement(
-            parse_statement()
+            std::move(statement)
         );
     }
 
+    statements->set_has_return(has_return_statement);
     return statements;
 }
 
-std::unique_ptr<variable_declaration> parser::parse_variable_declaration()
+std::unique_ptr<variable_declaration> parser::parse_variable_declaration(const token &type_specifier, 
+                                                                         const token &identifier)
 {
-    const auto &type_specifier = current_token();
-
-    if (!consume(token_type::int_keyword))
-    {
-        throw std::runtime_error("Expected a type specifier");
-    }
-
-    const auto &identifier = current_token();
-
-    if (!consume(token_type::identifier))
-    {
-        throw std::runtime_error("Expected an identifier");
-    }
-
     symbols_.declare(identifier.text);
 
     if (consume(token_type::semicolon))
@@ -191,6 +190,55 @@ std::unique_ptr<variable_declaration> parser::parse_variable_declaration()
         type_specifier,
         identifier,
         std::move(initializer)
+    );
+}
+
+std::unique_ptr<function_declaration> parser::parse_function_declaration(const token &type_specifier, 
+                                                                         const token &identifier)
+{
+    if (!consume(token_type::open_parenthesis))
+    {
+        throw std::runtime_error("Expected a '('");
+    }
+
+    // TODO: Parse parameter declarations
+
+    if (!consume(token_type::close_parenthesis))
+    {
+        throw std::runtime_error("Expected a ')'");
+    }
+
+    bool is_redeclared = symbols_.is_declared(identifier.text);
+
+    if (!is_redeclared)
+    {
+        symbols_.declare(identifier.text);
+    }
+
+    if (consume(token_type::semicolon))
+    {
+        return std::make_unique<function_declaration>(
+            type_specifier,
+            identifier,
+            nullptr,
+            is_redeclared
+        );
+    }
+
+    auto definition = parse_compound_statement();
+
+    if (type_specifier.type != token_type::void_keyword && !definition->returns())
+    {
+        throw std::runtime_error("Not all control paths return a value");
+    }
+
+    symbols_.define(identifier.text, true);
+
+    return std::make_unique<function_declaration>(
+        type_specifier,
+        identifier,
+        std::move(definition),
+        is_redeclared
     );
 }
 
@@ -238,10 +286,52 @@ std::unique_ptr<statement> parser::parse_statement()
     case token_type::return_keyword:
         return parse_return_statement();
     case token_type::int_keyword:
-        return parse_variable_declaration();
+        return parse_declaration();
     case token_type::open_brace:
         return parse_compound_statement();
     default:
         return parse_expression();
     }
+}
+
+std::unique_ptr<declaration> parser::parse_declaration()
+{
+    const auto &type_specifier = current_token();
+
+    if (!consume(token_type::int_keyword))
+    {
+        throw std::runtime_error("Expected a type specifier");
+    }
+
+    const auto &identifier = current_token();
+
+    if (!consume(token_type::identifier))
+    {
+        throw std::runtime_error("Expected an identifier");
+    }
+
+    if (match(token_type::open_parenthesis))
+    {
+        return parse_function_declaration(type_specifier, identifier);
+    }
+    else
+    {
+        return parse_variable_declaration(type_specifier, identifier);
+    }
+}
+
+std::unique_ptr<translation_unit_declaration> parser::parse_translation_unit()
+{
+    const auto &first = current_token();
+    std::vector<std::unique_ptr<declaration>> declarations;
+
+    while (!match(token_type::eof))
+    {
+        declarations.emplace_back(parse_declaration());
+    }
+
+    return std::make_unique<translation_unit_declaration>(
+        first,
+        std::move(declarations)
+    );
 }

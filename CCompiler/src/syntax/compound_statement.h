@@ -8,6 +8,7 @@ class compound_statement : public statement
 public:
     compound_statement(const token &trigger_token)
         : statement(trigger_token)
+        , has_return_(false)
     {
     }
 
@@ -30,8 +31,19 @@ public:
                + pos.to_string("<", ">");
     }
 
+    bool returns() const
+    {
+        return has_return_;
+    }
+
+    void set_has_return(bool has_return)
+    {
+        has_return_ = has_return;
+    }
+
 private:
     std::vector<std::unique_ptr<syntax_node>> statements_;
+    bool has_return_;
 };
 
 #endif

@@ -2,19 +2,21 @@
 #define C_COMPILER_PARSER_H
 
 #include "symbol_table.h"
-#include "syntax/syntax_node.h"
 #include "syntax/compound_statement.h"
+#include "syntax/translation_unit_declaration.h"
 #include "token.h"
 #include <vector>
 
-#include "syntax/expression.h"
-
+class syntax_node;
 class declaration_reference_expression;
 class parenthesized_expression;
 class primary_expression;
 class return_statement;
 class variable_declaration;
 class binary_expression;
+class expression;
+class function_declaration;
+class declaration;
 
 // TODO: Implement better error handling and reporting
 
@@ -32,7 +34,7 @@ public:
 
     std::unique_ptr<syntax_node> parse_contents()
     {
-        return parse_compound_statement();
+        return parse_translation_unit();
     }
 
 private:
@@ -113,10 +115,13 @@ private:
     std::unique_ptr<primary_expression>               parse_primary_expression();
     std::unique_ptr<return_statement>                 parse_return_statement();
     std::unique_ptr<compound_statement>               parse_compound_statement();
-    std::unique_ptr<variable_declaration>             parse_variable_declaration();
+    std::unique_ptr<variable_declaration>             parse_variable_declaration(const token &type_specifier, const token &identifier);
+    std::unique_ptr<function_declaration>             parse_function_declaration(const token &type_specifier, const token &identifier);
     std::unique_ptr<binary_expression>                parse_binary_expression();
     std::unique_ptr<expression>                       parse_expression();
     std::unique_ptr<statement>                        parse_statement();
+    std::unique_ptr<declaration>                      parse_declaration();
+    std::unique_ptr<translation_unit_declaration>     parse_translation_unit();
 
 private:
     std::size_t index_;

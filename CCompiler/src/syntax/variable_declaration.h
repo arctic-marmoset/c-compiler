@@ -1,15 +1,15 @@
 #ifndef C_COMPILER_VARIABLE_DECLARATION_H
 #define C_COMPILER_VARIABLE_DECLARATION_H
 
-#include "statement.h"
+#include "syntax/declaration.h"
 
-class variable_declaration : public statement
+class variable_declaration : public declaration
 {
 public:
     variable_declaration(const token &type_specifier,
                          const token &identifier,
                          std::unique_ptr<expression> initializer = nullptr)
-        : statement(type_specifier)
+        : declaration(type_specifier)
         , type_specifier_(type_specifier)
         , identifier_(identifier)
         , initializer_(std::move(initializer))
@@ -31,10 +31,10 @@ public:
 
         const auto &pos = trigger_token().pos;
 
-        ss << "variable_declaration"             " "
-              + pos.to_string("<", ">")        + " "
-              "used " + identifier_.get().text + " "
-              "'" + type_specifier_.get().text + "'";
+        ss << "variable_declaration"               " "
+              + pos.to_string("<", ">")          + " "
+                "used " + identifier_.get().text + " "
+                "'" + type_specifier_.get().text + "'";
 
         if (initializer_)
         {

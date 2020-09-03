@@ -14,8 +14,10 @@ enum class syntax_type
     parenthesized_expression,
     declaration_reference_expression,
     variable_declaration,
+    function_declaration,
     return_statement,
     compound_statement,
+    translation_unit_declaration,
 };
 
 class syntax_node
