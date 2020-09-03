@@ -1,11 +1,20 @@
 #ifndef C_COMPILER_PARSER_H
 #define C_COMPILER_PARSER_H
 
-#include "syntax/expression.h"
-#include "syntax/statement.h"
+#include "symbol_table.h"
 #include "syntax/syntax_node.h"
+#include "syntax/compound_statement.h"
 #include "token.h"
 #include <vector>
+
+#include "syntax/expression.h"
+
+class declaration_reference_expression;
+class parenthesized_expression;
+class primary_expression;
+class return_statement;
+class variable_declaration;
+class binary_expression;
 
 // TODO: Implement better error handling and reporting
 
@@ -27,27 +36,39 @@ public:
     }
 
 private:
-    const token& current_token() const
+    const token &current_token() const
     {
         return tokens_.get()[index_];
     }
 
+    const token &peek_token(std::size_t lookahead)
+    {
+        const auto peekIndex = index_ + lookahead;
+        if (peekIndex <= tokens_.get().size())
+        {
+            return tokens_.get()[peekIndex];
+        }
+        else
+        {
+            return tokens_.get().back();
+        }
+    }
+
     void advance()
     {
-        if (index_ + 1 < tokens_.get().size())
+        if (index_ <= tokens_.get().size())
         {
             index_++;
         }
     }
 
     /**
-     * @brief Asserts that the current token is of the specified `type`,
-     *        and advances to the next token if true.
+     * @brief Consumes a token of the specified `token_type`.
      *
-     * @param[in] type The type that the current token should match.
-     * @return         `true` if the assertion passed. `false` otherwise.
+     * @param[in] type The `token_type` that the current token should match.
+     * @return         `true` if the current token was consumed. `false` otherwise.
      */
-    bool expect(token_type type)
+    bool consume(token_type type)
     {
         const bool matched = match(type);
 
@@ -86,15 +107,21 @@ private:
         return match(first) || match(rest...);
     }
 
-    std::unique_ptr<primary_expression>       parse_literal();
-    std::unique_ptr<parenthesized_expression> parse_parenthesized_expression();
-    std::unique_ptr<primary_expression>       parse_primary_expression();
-    std::unique_ptr<return_statement>         parse_return_statement();
-    std::unique_ptr<compound_statement>       parse_compound_statement();
+    std::unique_ptr<primary_expression>               parse_literal();
+    std::unique_ptr<parenthesized_expression>         parse_parenthesized_expression();
+    std::unique_ptr<declaration_reference_expression> parse_declaration_reference_expression();
+    std::unique_ptr<primary_expression>               parse_primary_expression();
+    std::unique_ptr<return_statement>                 parse_return_statement();
+    std::unique_ptr<compound_statement>               parse_compound_statement();
+    std::unique_ptr<variable_declaration>             parse_variable_declaration();
+    std::unique_ptr<binary_expression>                parse_binary_expression();
+    std::unique_ptr<expression>                       parse_expression();
+    std::unique_ptr<statement>                        parse_statement();
 
 private:
     std::size_t index_;
     const_reference<std::vector<token>> tokens_;
+    symbol_table symbols_;
 };
 
 #endif

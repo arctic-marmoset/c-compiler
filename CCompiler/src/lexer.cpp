@@ -84,6 +84,11 @@ token lexer::next_token()
             consume();
             return create_token(token_type::forward_slash);
         }
+    case chardefs::equal:
+        {
+            consume();
+            return create_token(token_type::assign);
+        }
     case chardefs::open_paren:
         {
             consume();

@@ -163,9 +163,18 @@
     <ClInclude Include="src\definitions.h" />
     <ClInclude Include="src\lexer.h" />
     <ClInclude Include="src\parser.h" />
+    <ClInclude Include="src\symbol_table.h" />
+    <ClInclude Include="src\syntax\binary_expression.h" />
+    <ClInclude Include="src\syntax\compound_statement.h" />
+    <ClInclude Include="src\syntax\declaration_reference_expression.h" />
     <ClInclude Include="src\syntax\expression.h" />
+    <ClInclude Include="src\syntax\literal.h" />
+    <ClInclude Include="src\syntax\parenthesized_expression.h" />
+    <ClInclude Include="src\syntax\primary_expression.h" />
+    <ClInclude Include="src\syntax\return_statement.h" />
     <ClInclude Include="src\syntax\statement.h" />
     <ClInclude Include="src\syntax\syntax_node.h" />
+    <ClInclude Include="src\syntax\variable_declaration.h" />
     <ClInclude Include="src\token.h" />
     <ClInclude Include="src\token_type.h" />
   </ItemGroup>

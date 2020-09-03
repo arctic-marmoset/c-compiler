@@ -12,6 +12,8 @@ enum class syntax_type
     string_literal,
     binary_expression,
     parenthesized_expression,
+    declaration_reference_expression,
+    variable_declaration,
     return_statement,
     compound_statement,
 };
