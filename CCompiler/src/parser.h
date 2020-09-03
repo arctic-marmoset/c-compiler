@@ -6,6 +6,7 @@
 #include "syntax/translation_unit_declaration.h"
 #include "token.h"
 #include <vector>
+#include <stack>
 
 class syntax_node;
 class declaration;
@@ -29,6 +30,7 @@ public:
     explicit parser(const std::vector<token> &tokens)
         : index_(0)
         , tokens_(tokens)
+        , scope_({ &symbols_ })
     {
     }
 
@@ -128,6 +130,7 @@ private:
     std::size_t index_;
     const_reference<std::vector<token>> tokens_;
     symbol_table symbols_;
+    std::stack<symbol_table *> scope_;
 };
 
 #endif

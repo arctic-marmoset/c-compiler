@@ -69,7 +69,7 @@ std::unique_ptr<declaration_reference_expression> parser::parse_declaration_refe
         throw std::runtime_error("Expected an lvalue");
     }
 
-    if (!symbols_.is_declared(identifier.text))
+    if (!scope_.top()->has_declared(identifier.text))
     {
         throw std::runtime_error(
             "Identifier '" + identifier.text + "' is undefined"
@@ -130,6 +130,9 @@ std::unique_ptr<return_statement> parser::parse_return_statement()
 
 std::unique_ptr<compound_statement> parser::parse_compound_statement()
 {
+    auto local_scope = symbol_table(scope_.top());
+    scope_.push(&local_scope);
+
     const auto &start = current_token();
 
     if (!consume(token_type::open_brace))
@@ -156,18 +159,20 @@ std::unique_ptr<compound_statement> parser::parse_compound_statement()
     }
 
     statements->set_has_return(has_return_statement);
+    scope_.pop();
+
     return statements;
 }
 
 std::unique_ptr<variable_declaration> parser::parse_variable_declaration(const token &type_specifier, 
                                                                          const token &identifier)
 {
-    if (symbols_.is_declared(identifier.text))
+    if (scope_.top()->has_declared_in_scope(identifier.text))
     {
         throw std::runtime_error("Redefinition of " + identifier.text);
     }
 
-    symbols_.declare(identifier.text);
+    scope_.top()->declare(identifier.text);
 
     if (consume(token_type::semicolon))
     {
@@ -189,7 +194,7 @@ std::unique_ptr<variable_declaration> parser::parse_variable_declaration(const t
         throw std::runtime_error("Expected a ';'");
     }
 
-    symbols_.define(identifier.text, true);
+    scope_.top()->define(identifier.text, true);
 
     return std::make_unique<variable_declaration>(
         type_specifier,
@@ -213,11 +218,11 @@ std::unique_ptr<function_declaration> parser::parse_function_declaration(const t
         throw std::runtime_error("Expected a ')'");
     }
 
-    bool is_redeclared = symbols_.is_declared(identifier.text);
+    bool is_redeclared = scope_.top()->has_declared(identifier.text);
 
     if (!is_redeclared)
     {
-        symbols_.declare(identifier.text);
+        scope_.top()->declare(identifier.text);
     }
 
     if (consume(token_type::semicolon))
@@ -230,7 +235,7 @@ std::unique_ptr<function_declaration> parser::parse_function_declaration(const t
         );
     }
 
-    if (symbols_.is_defined(identifier.text))
+    if (scope_.top()->has_defined(identifier.text))
     {
         throw std::runtime_error("Redefinition of " + identifier.text);
     }
@@ -242,7 +247,7 @@ std::unique_ptr<function_declaration> parser::parse_function_declaration(const t
         throw std::runtime_error("Not all control paths return a value");
     }
 
-    symbols_.define(identifier.text, true);
+    scope_.top()->define(identifier.text, true);
 
     return std::make_unique<function_declaration>(
         type_specifier,
@@ -279,21 +284,14 @@ std::unique_ptr<expression> parser::parse_expression()
 {
     const auto &next = peek_token(1);
 
-    try
+    if (next.type == token_type::plus ||
+        next.type == token_type::assign)
     {
-        if (next.type == token_type::plus ||
-            next.type == token_type::assign)
-        {
-            return parse_binary_expression();
-        }
-        else
-        {
-            return parse_primary_expression();
-        }
+        return parse_binary_expression();
     }
-    catch (...)
+    else
     {
-        throw std::runtime_error("Expected an expression");
+        return parse_primary_expression();
     }
 }
 

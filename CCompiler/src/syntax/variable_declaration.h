@@ -31,9 +31,9 @@ public:
 
         const auto &pos = trigger_token().pos;
 
-        ss << "variable_declaration"               " "
-              + pos.to_string("<", ">")          + " "
-                "used " + identifier_.get().text + " "
+        ss << "variable_declaration"      " "
+              + pos.to_string("<", ">") + " "
+              + identifier_.get().text  + " "
                 "'" + type_specifier_.get().text + "'";
 
         if (initializer_)
