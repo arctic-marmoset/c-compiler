@@ -86,6 +86,9 @@
     <ClInclude Include="src\syntax\declaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\syntax\syntax_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="grammar\c_syntax.ebnf" />
