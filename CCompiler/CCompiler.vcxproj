@@ -176,6 +176,7 @@
     <ClInclude Include="src\syntax\return_statement.h" />
     <ClInclude Include="src\syntax\statement.h" />
     <ClInclude Include="src\syntax\syntax_node.h" />
+    <ClInclude Include="src\syntax\syntax_type.h" />
     <ClInclude Include="src\syntax\translation_unit_declaration.h" />
     <ClInclude Include="src\syntax\variable_declaration.h" />
     <ClInclude Include="src\token.h" />

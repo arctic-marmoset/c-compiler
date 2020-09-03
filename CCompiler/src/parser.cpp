@@ -1,5 +1,4 @@
 #include "parser.h"
-
 #include "syntax/binary_expression.h"
 #include "syntax/compound_statement.h"
 #include "syntax/declaration_reference_expression.h"
@@ -48,7 +47,7 @@ std::unique_ptr<parenthesized_expression> parser::parse_parenthesized_expression
         throw std::runtime_error("Expected a '('");
     }
 
-    auto expression = parse_expression();
+    auto expr = parse_expression();
 
     if (!consume(token_type::close_parenthesis))
     {
@@ -57,7 +56,7 @@ std::unique_ptr<parenthesized_expression> parser::parse_parenthesized_expression
 
     return std::make_unique<parenthesized_expression>(
         start_token,
-        std::move(expression)
+        std::move(expr)
     );
 }
 
@@ -144,15 +143,15 @@ std::unique_ptr<compound_statement> parser::parse_compound_statement()
 
     while (!consume(token_type::close_brace))
     {
-        auto statement = parse_statement();
+        auto stmt = parse_statement();
 
-        if (statement->type() == syntax_type::return_statement)
+        if (stmt->type() == syntax_type::return_statement)
         {
             has_return_statement = true;
         }
 
         statements->add_statement(
-            std::move(statement)
+            std::move(stmt)
         );
     }
 
@@ -280,25 +279,32 @@ std::unique_ptr<expression> parser::parse_expression()
 {
     const auto &next = peek_token(1);
 
-    if (next.type == token_type::plus ||
-        next.type == token_type::assign)
+    try
     {
-        return parse_binary_expression();
+        if (next.type == token_type::plus ||
+            next.type == token_type::assign)
+        {
+            return parse_binary_expression();
+        }
+        else
+        {
+            return parse_primary_expression();
+        }
     }
-    else
+    catch (...)
     {
-        return parse_primary_expression();
+        throw std::runtime_error("Expected an expression");
     }
 }
 
 std::unique_ptr<statement> parser::parse_expression_statement()
 {
-    auto expression = parse_expression();
+    auto expr = parse_expression();
     if (!consume(token_type::semicolon))
     {
         throw std::runtime_error("Expected a ';'");
     }
-    return expression;
+    return expr;
 }
 
 std::unique_ptr<statement> parser::parse_statement()

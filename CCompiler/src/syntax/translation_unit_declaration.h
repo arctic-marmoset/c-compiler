@@ -11,9 +11,9 @@ public:
         : syntax_node(trigger_token)
         , declarations_(std::move(declarations))
     {
-        for (const auto &declaration : declarations_)
+        for (const auto &decl : declarations_)
         {
-            children_.push_back(declaration.get());
+            children_.push_back(decl.get());
         }
     }
 

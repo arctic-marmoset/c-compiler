@@ -8,15 +8,15 @@
 #include <vector>
 
 class syntax_node;
-class declaration_reference_expression;
-class parenthesized_expression;
-class primary_expression;
-class return_statement;
-class variable_declaration;
-class binary_expression;
-class expression;
-class function_declaration;
 class declaration;
+class expression;
+class primary_expression;
+class binary_expression;
+class parenthesized_expression;
+class variable_declaration;
+class function_declaration;
+class declaration_reference_expression;
+class return_statement;
 
 // TODO: Implement better error handling and reporting
 
@@ -109,19 +109,19 @@ private:
         return match(first) || match(rest...);
     }
 
+    std::unique_ptr<variable_declaration>             parse_variable_declaration(const token &type_specifier, const token &identifier);
+    std::unique_ptr<function_declaration>             parse_function_declaration(const token &type_specifier, const token &identifier);
+    std::unique_ptr<declaration>                      parse_declaration();
     std::unique_ptr<primary_expression>               parse_literal();
     std::unique_ptr<parenthesized_expression>         parse_parenthesized_expression();
     std::unique_ptr<declaration_reference_expression> parse_declaration_reference_expression();
     std::unique_ptr<primary_expression>               parse_primary_expression();
-    std::unique_ptr<return_statement>                 parse_return_statement();
-    std::unique_ptr<compound_statement>               parse_compound_statement();
-    std::unique_ptr<variable_declaration>             parse_variable_declaration(const token &type_specifier, const token &identifier);
-    std::unique_ptr<function_declaration>             parse_function_declaration(const token &type_specifier, const token &identifier);
     std::unique_ptr<binary_expression>                parse_binary_expression();
     std::unique_ptr<expression>                       parse_expression();
+    std::unique_ptr<return_statement>                 parse_return_statement();
+    std::unique_ptr<compound_statement>               parse_compound_statement();
     std::unique_ptr<statement>                        parse_expression_statement();
     std::unique_ptr<statement>                        parse_statement();
-    std::unique_ptr<declaration>                      parse_declaration();
     std::unique_ptr<translation_unit_declaration>     parse_translation_unit();
 
 private:
