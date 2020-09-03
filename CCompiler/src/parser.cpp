@@ -72,8 +72,9 @@ std::unique_ptr<declaration_reference_expression> parser::parse_declaration_refe
 
     if (!symbols_.is_declared(identifier.text))
     {
-        auto message = std::string("Identifier '") + identifier.text + "' is undefined";
-        throw std::runtime_error(message);
+        throw std::runtime_error(
+            "Identifier '" + identifier.text + "' is undefined"
+        );
     }
 
     return std::make_unique<declaration_reference_expression>(identifier);
@@ -162,6 +163,11 @@ std::unique_ptr<compound_statement> parser::parse_compound_statement()
 std::unique_ptr<variable_declaration> parser::parse_variable_declaration(const token &type_specifier, 
                                                                          const token &identifier)
 {
+    if (symbols_.is_declared(identifier.text))
+    {
+        throw std::runtime_error("Redefinition of " + identifier.text);
+    }
+
     symbols_.declare(identifier.text);
 
     if (consume(token_type::semicolon))
@@ -223,6 +229,11 @@ std::unique_ptr<function_declaration> parser::parse_function_declaration(const t
             nullptr,
             is_redeclared
         );
+    }
+
+    if (symbols_.is_defined(identifier.text))
+    {
+        throw std::runtime_error("Redefinition of " + identifier.text);
     }
 
     auto definition = parse_compound_statement();
