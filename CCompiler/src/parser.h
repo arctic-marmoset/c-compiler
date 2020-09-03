@@ -119,6 +119,7 @@ private:
     std::unique_ptr<function_declaration>             parse_function_declaration(const token &type_specifier, const token &identifier);
     std::unique_ptr<binary_expression>                parse_binary_expression();
     std::unique_ptr<expression>                       parse_expression();
+    std::unique_ptr<statement>                        parse_expression_statement();
     std::unique_ptr<statement>                        parse_statement();
     std::unique_ptr<declaration>                      parse_declaration();
     std::unique_ptr<translation_unit_declaration>     parse_translation_unit();

@@ -260,7 +260,9 @@ std::unique_ptr<binary_expression> parser::parse_binary_expression()
     auto left = parse_primary_expression();
 
     const auto &op = current_token();
-    if (!consume(token_type::plus))
+
+    if (!consume(token_type::plus) &&
+        !consume(token_type::assign))
     {
         throw std::runtime_error("Expected a binary operator");
     }
@@ -278,7 +280,8 @@ std::unique_ptr<expression> parser::parse_expression()
 {
     const auto &next = peek_token(1);
 
-    if (next.type == token_type::plus)
+    if (next.type == token_type::plus ||
+        next.type == token_type::assign)
     {
         return parse_binary_expression();
     }
@@ -286,6 +289,16 @@ std::unique_ptr<expression> parser::parse_expression()
     {
         return parse_primary_expression();
     }
+}
+
+std::unique_ptr<statement> parser::parse_expression_statement()
+{
+    auto expression = parse_expression();
+    if (!consume(token_type::semicolon))
+    {
+        throw std::runtime_error("Expected a ';'");
+    }
+    return expression;
 }
 
 std::unique_ptr<statement> parser::parse_statement()
@@ -301,7 +314,7 @@ std::unique_ptr<statement> parser::parse_statement()
     case token_type::open_brace:
         return parse_compound_statement();
     default:
-        return parse_expression();
+        return parse_expression_statement();
     }
 }
 
