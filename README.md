@@ -16,6 +16,7 @@ Statements and expressions that have been implemented include:
 - Variable declarations
 - Function declarations
 - Compound statements
+- Return statements
 
 ## Usage
 
