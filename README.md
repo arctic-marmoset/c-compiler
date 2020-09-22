@@ -1,6 +1,6 @@
 # C Compiler
 
-A compiler for a stripped-down version of ANSI C.
+An ANSI C to RISC-V compiler written from scratch.
 
 Currently, the compiler is able to:
 - Open a source file passed as a command-line argument
