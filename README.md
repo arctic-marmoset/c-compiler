@@ -6,7 +6,7 @@ Currently, the compiler is able to:
 - Open a source file passed as a command-line argument
 - Tokenise the source file by recursively matching character sequences
 - Generate an intermediate representation (IR)—currently an abstract syntax tree—by recursively matching token sequences with rules defined by the C grammar (as in an LR(1) parser)
-- Keep track of function and variable declaration scope using a queue of symbol tables
+- Keep track of function and variable declaration scope using a symbol table stack
   - Shadow variables previously defined in parent scope
 
 Statements and expressions that have been implemented include:
