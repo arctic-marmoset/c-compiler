@@ -1,7 +1,12 @@
 # Directories
+.idea/
 .vs/
-bin/
-bin-int/
+.vscode/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+cmake-build-*/
 
 # Files
 **/*.user
+**/.DS_Store
