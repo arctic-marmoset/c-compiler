@@ -1,6 +1,9 @@
 #include "lexer.h"
 #include "parser.h"
+
 #include <algorithm>
+#include <cctype>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 
@@ -12,6 +15,11 @@ void run_debug();
 int main(int argc, char **argv)
 {
 #ifdef NDEBUG
+    if (argc < 2)
+    {
+        std::cerr << "No input file provided\n";
+        return EXIT_FAILURE;
+    }
     run(argv[1]);
 #else
     run_debug();
@@ -26,13 +34,13 @@ void run_debug()
         std::string source;
 
         std::getline(std::cin, source);
-        if (std::all_of(source.begin(), source.end(), std::isspace))
+        if (std::all_of(source.begin(), source.end(), [](unsigned char c) { return std::isspace(c); }))
         {
             break;
         }
 
-        auto lex = lexer(source);
-        auto tokens = lex.lex_contents();
+        auto lexer = cc::lexer(source);
+        auto tokens = lexer.lex_contents();
         std::cout << "== TOKENS ==" << "\n\n";
         for (const auto &token : tokens)
         {
@@ -42,14 +50,14 @@ void run_debug()
         }
         std::cout << '\n';
 
-        auto par = parser(tokens);
+        auto par = cc::parser(tokens);
 
-        std::shared_ptr<syntax_node> root;
+        std::shared_ptr<cc::syntax_node> root;
         try
         {
             root = par.parse_contents();
         }
-        catch (std::runtime_error &ex)
+        catch (const std::exception &ex)
         {
             std::cout << "Error: " << ex.what() << '\n';
             continue;
@@ -63,7 +71,7 @@ void run_debug()
 
 void run(const std::string &file_name)
 {
-    auto in = std::ifstream(file_name, std::ios::in | std::ios::binary);
+    auto in = std::ifstream(file_name, std::ios::binary | std::ios::ate);
 
     if (!in)
     {
@@ -71,31 +79,27 @@ void run(const std::string &file_name)
         return;
     }
 
-    // Get char count of file. Note that istream::tellg() returns an
-    // std::streampos which is not guaranteed to be the same size as
-    // std::size_t (e.g. in the case that the file is greater than
-    // 4 GB on a 32-bit system). We will assume that no source files
-    // being read exceed this value.
+    // Get char count of file. Note that istream::tellg() returns an std::streampos which is not
+    // guaranteed to be the same size as std::size_t (e.g. in the case that the file is greater than
+    // 4 GB on a 32-bit system). We will assume that no source files being read exceed this value.
 
-    // Seek to end
-    in.seekg(0, std::ios::end);
+    // Get start and end positions
+    const auto end = in.tellg();
+    in.seekg(0, std::ios::beg);
+    const auto start = in.tellg();
 
-    // Get char position
-    const auto count = static_cast<std::size_t>(in.tellg());
+    const auto size = static_cast<std::size_t>(end - start);
 
     // Construct a string with this size
     std::string source;
-    source.resize(count);
-
-    // Seek back to beginning
-    in.seekg(0, std::ios::beg);
+    source.resize(size);
 
     // Read file stream into source string
-    in.read(source.data(), source.size());
+    in.read(source.data(), static_cast<std::streamsize>(size));
     in.close();
 
-    auto lex = lexer(source);
-    auto tokens = lex.lex_contents();
+    auto lexer = cc::lexer(source);
+    auto tokens = lexer.lex_contents();
 
     std::cout << "== TOKENS ==" << "\n\n";
     for (const auto &token : tokens)
@@ -106,20 +110,20 @@ void run(const std::string &file_name)
     }
     std::cout << '\n';
 
-    auto par = parser(tokens);
+    auto parser = cc::parser(tokens);
 
-    std::shared_ptr<syntax_node> root;
+    std::unique_ptr<cc::syntax_node> root;
     try
     {
-        root = par.parse_contents();
+        root = parser.parse_contents();
     }
-    catch (std::runtime_error &ex)
+    catch (const std::exception &ex)
     {
         std::cout << "Error: " << ex.what() << '\n';
         return;
     }
 
     std::cout << "== AST ==" << "\n\n";
-    std::cout << root->tree_representation();
+    std::cout << root->tree_representation() << '\n';
     std::cout << '\n';
 }

@@ -1,12 +1,15 @@
 #ifndef C_COMPILER_EXPRESSION_H
 #define C_COMPILER_EXPRESSION_H
 
+#include "token.h"
 #include "syntax/statement.h"
 
-class expression : public statement
+namespace cc {
+
+class expression : public cc::statement
 {
 public:
-    ~expression() = default;
+    ~expression() override = default;
 
     expression(const expression &) = delete;
     expression(expression &&) = delete;
@@ -14,10 +17,12 @@ public:
     expression &operator=(expression &&) = delete;
 
 protected:
-    expression(const token &trigger_token)
+    explicit expression(const cc::token &trigger_token)
         : statement(trigger_token)
     {
     }
 };
+
+}
 
 #endif

@@ -1,9 +1,13 @@
 #ifndef C_COMPILER_DECLARATION_H
 #define C_COMPILER_DECLARATION_H
 
+#include "token.h"
+#include "syntax/statement.h"
 #include "syntax/syntax_node.h"
 
-class declaration : public statement
+namespace cc {
+
+class declaration : public cc::statement
 {
 public:
     declaration(const declaration &) = delete;
@@ -12,10 +16,12 @@ public:
     declaration &operator=(declaration &&) = delete;
 
 protected:
-    declaration(const token &trigger_token)
+    explicit declaration(const cc::token &trigger_token)
         : statement(trigger_token)
     {
     }
 };
+
+}
 
 #endif

@@ -1,19 +1,23 @@
 #ifndef C_COMPILER_DECLARATION_REFERENCE_EXPRESSION_H
 #define C_COMPILER_DECLARATION_REFERENCE_EXPRESSION_H
 
-#include "primary_expression.h"
+#include "token.h"
+#include "syntax/primary_expression.h"
+#include "syntax/syntax_type.h"
 
-class declaration_reference_expression : public primary_expression
+namespace cc {
+
+class declaration_reference_expression : public cc::primary_expression
 {
 public:
-    declaration_reference_expression(const token &trigger_token)
+    declaration_reference_expression(const cc::token &trigger_token)
         : primary_expression(trigger_token)
     {
     }
 
-    syntax_type type() const override
+    cc::syntax_type type() const override
     {
-        return syntax_type::declaration_reference_expression;
+        return cc::syntax_type::declaration_reference_expression;
     }
 
     std::string to_string() const override
@@ -25,5 +29,7 @@ public:
                "lvalue Var '" + text + "'";
     }
 };
+
+}
 
 #endif

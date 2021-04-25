@@ -5,14 +5,16 @@
 #include <stdexcept>
 #include <unordered_map>
 
-// TODO: table::value_type::second_type should countain symbol information
+// TODO: table::value_type::second_type should contain symbol information
+
+namespace cc {
 
 class symbol_table
 {
     using table = std::unordered_map<std::string_view, bool>;
 
 public:
-    symbol_table(const symbol_table *enclosing = nullptr)
+    explicit symbol_table(const symbol_table *enclosing = nullptr)
         : enclosing_(enclosing)
     {
     }
@@ -87,5 +89,7 @@ private:
     table symbols_;
     const symbol_table *enclosing_;
 };
+
+}
 
 #endif

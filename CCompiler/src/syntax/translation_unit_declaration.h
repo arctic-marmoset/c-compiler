@@ -1,13 +1,20 @@
 #ifndef C_COMPILER_TRANSLATION_UNIT_H
 #define C_COMPILER_TRANSLATION_UNIT_H
 
+#include "token.h"
 #include "syntax/declaration.h"
+#include "syntax/syntax_node.h"
+#include "syntax/syntax_type.h"
 
-class translation_unit_declaration : public syntax_node
+#include <memory>
+
+namespace cc {
+
+class translation_unit_declaration : public cc::syntax_node
 {
 public:
-    translation_unit_declaration(const token &trigger_token,
-                                 std::vector<std::unique_ptr<declaration>> declarations)
+    translation_unit_declaration(const cc::token &trigger_token,
+                                 std::vector<std::unique_ptr<cc::declaration>> declarations)
         : syntax_node(trigger_token)
         , declarations_(std::move(declarations))
     {
@@ -17,9 +24,9 @@ public:
         }
     }
 
-    syntax_type type() const override
+    cc::syntax_type type() const override
     {
-        return syntax_type::translation_unit_declaration;
+        return cc::syntax_type::translation_unit_declaration;
     }
 
     std::string to_string() const override
@@ -28,7 +35,9 @@ public:
     }
 
 private:
-    std::vector<std::unique_ptr<declaration>> declarations_;
+    std::vector<std::unique_ptr<cc::declaration>> declarations_;
 };
+
+}
 
 #endif

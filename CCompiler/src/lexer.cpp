@@ -1,12 +1,15 @@
 #include "lexer.h"
+#include "token.h"
+#include "token_type.h"
+
 #include <cctype>
 #include <unordered_map>
 
-std::vector<token> lexer::lex_contents()
+std::vector<cc::token> cc::lexer::lex_contents()
 {
-    std::vector<token> tokens;
+    std::vector<cc::token> tokens;
 
-    while (current() != chardefs::eof)
+    while (current() != cc::chardefs::eof)
     {
         tokens.push_back(next_token());
     }
@@ -14,7 +17,7 @@ std::vector<token> lexer::lex_contents()
     return tokens;
 }
 
-token lexer::next_token()
+cc::token cc::lexer::next_token()
 {
     // Cache starting column of token
     start_column_ = column_;
@@ -23,31 +26,31 @@ token lexer::next_token()
     const char first_char = current();
 
     // Skip CR since no modern OS uses CR for newline
-    if (first_char == chardefs::cr)
+    if (first_char == cc::chardefs::cr)
     {
         advance();
         return next_token();
     }
 
-    if (first_char == chardefs::lf)
+    if (first_char == cc::chardefs::lf)
     {
         handle_newline();
         return next_token();
     }
 
     // Nothing to lex if current() == eof
-    if (first_char == chardefs::eof)
+    if (first_char == cc::chardefs::eof)
     {
-        return create_token(token_type::eof);
+        return create_token(cc::token_type::eof);
     }
 
     // Look for keyword or literal
-    if (first_char == chardefs::quote)
+    if (first_char == cc::chardefs::quote)
     {
         consume();
         return read_string();
     }
-    if (std::isalpha(first_char) || first_char == chardefs::underscore)
+    if (std::isalpha(first_char) || first_char == cc::chardefs::underscore)
     {
         return read_identifier();
     }
@@ -64,80 +67,80 @@ token lexer::next_token()
     // Not keyword nor literal, so look for operator or separator
     switch (first_char)
     {
-    case chardefs::plus:
+    case cc::chardefs::plus:
         {
             consume();
-            return create_token(token_type::plus);
+            return create_token(cc::token_type::plus);
         }
-    case chardefs::dash:
+    case cc::chardefs::dash:
         {
             consume();
-            return create_token(token_type::minus);
+            return create_token(cc::token_type::minus);
         }
-    case chardefs::asterisk:
+    case cc::chardefs::asterisk:
         {
             consume();
-            return create_token(token_type::asterisk);
+            return create_token(cc::token_type::asterisk);
         }
-    case chardefs::forward_slash:
+    case cc::chardefs::forward_slash:
         {
             consume();
-            return create_token(token_type::forward_slash);
+            return create_token(cc::token_type::forward_slash);
         }
-    case chardefs::equal:
+    case cc::chardefs::equal:
         {
             consume();
-            return create_token(token_type::assign);
+            return create_token(cc::token_type::assign);
         }
-    case chardefs::open_paren:
+    case cc::chardefs::open_paren:
         {
             consume();
-            return create_token(token_type::open_parenthesis);
+            return create_token(cc::token_type::open_parenthesis);
         }
-    case chardefs::close_paren:
+    case cc::chardefs::close_paren:
         {
             consume();
-            return create_token(token_type::close_parenthesis);
+            return create_token(cc::token_type::close_parenthesis);
         }
-    case chardefs::open_brace:
+    case cc::chardefs::open_brace:
         {
             consume();
-            return create_token(token_type::open_brace);
+            return create_token(cc::token_type::open_brace);
         }
-    case chardefs::close_brace:
+    case cc::chardefs::close_brace:
         {
             consume();
-            return create_token(token_type::close_brace);
+            return create_token(cc::token_type::close_brace);
         }
-    case chardefs::open_angle:
+    case cc::chardefs::open_angle:
         {
             consume();
-            return create_token(token_type::open_angle);
+            return create_token(cc::token_type::open_angle);
         }
-    case chardefs::close_angle:
+    case cc::chardefs::close_angle:
         {
             consume();
-            return create_token(token_type::close_angle);
+            return create_token(cc::token_type::close_angle);
         }
-    case chardefs::open_square:
+    case cc::chardefs::open_square:
         {
             consume();
-            return create_token(token_type::open_square);
+            return create_token(cc::token_type::open_square);
         }
-    case chardefs::close_square:
+    case cc::chardefs::close_square:
         {
             consume();
-            return create_token(token_type::close_square);
+            return create_token(cc::token_type::close_square);
         }
-    case chardefs::comma:
+    case cc::chardefs::comma:
         {
             consume();
-            return create_token(token_type::comma);
+            return create_token(cc::token_type::comma);
         }
-    case chardefs::semicolon:
+    case cc::chardefs::semicolon:
         {
             consume();
-            return create_token(token_type::semicolon);
+            return create_token(cc::token_type::semicolon);
         }
     default:
         break;
@@ -147,15 +150,15 @@ token lexer::next_token()
     return read_unknown();
 }
 
-token lexer::read_string()
+cc::token cc::lexer::read_string()
 {
     // TODO: Report missing closing quote as error
 
-    while (current() != chardefs::quote &&
-           current() != chardefs::backslash &&
-           current() != chardefs::cr &&
-           current() != chardefs::lf &&
-           current() != chardefs::eof)
+    while (current() != cc::chardefs::quote &&
+           current() != cc::chardefs::backslash &&
+           current() != cc::chardefs::cr &&
+           current() != cc::chardefs::lf &&
+           current() != cc::chardefs::eof)
     {
         consume();
     }
@@ -164,35 +167,35 @@ token lexer::read_string()
 
     switch (breaking_char)
     {
-    case chardefs::cr:
+    case cc::chardefs::cr:
         {
             advance();
             return read_string();
         }
-    case chardefs::lf:
+    case cc::chardefs::lf:
         {
             handle_newline();
             break;
         }
-    case chardefs::quote:
+    case cc::chardefs::quote:
         {
             consume();
             break;
         }
-    case chardefs::backslash:
+    case cc::chardefs::backslash:
         {
             return read_escaped();
         }
-    case chardefs::eof:
+    case cc::chardefs::eof:
         {
-            return create_token(token_type::unknown);
+            return create_token(cc::token_type::unknown);
         }
     }
 
-    return create_token(token_type::string_literal);
+    return create_token(cc::token_type::string_literal);
 }
 
-token lexer::read_escaped()
+cc::token cc::lexer::read_escaped()
 {
     // Skip the backslash for now. We will determine
     // whether it should be part of the string later.
@@ -204,10 +207,10 @@ token lexer::read_escaped()
 
     switch (first_char)
     {
-    case chardefs::single_quote:
-    case chardefs::double_quote:
-    case chardefs::question:
-    case chardefs::back_slash:
+    case cc::chardefs::single_quote:
+    case cc::chardefs::double_quote:
+    case cc::chardefs::question:
+    case cc::chardefs::back_slash:
     case 'a':
     case 'b':
     case 'f':
@@ -216,16 +219,16 @@ token lexer::read_escaped()
     case 't':
     case 'v':
         {
-            buffer_ << chardefs::back_slash;
+            buffer_ << cc::chardefs::back_slash;
             consume();
             break;
         }
-    case chardefs::cr:
+    case cc::chardefs::cr:
         {
             advance();
             return read_escaped();
         }
-    case chardefs::lf:
+    case cc::chardefs::lf:
         {
             handle_newline();
             break;
@@ -237,22 +240,22 @@ token lexer::read_escaped()
     return read_string();
 }
 
-token lexer::read_identifier()
+cc::token cc::lexer::read_identifier()
 {
-    while (std::isalnum(current()) || current() == chardefs::underscore)
+    while (std::isalnum(current()) || current() == cc::chardefs::underscore)
     {
         consume();
     }
 
-    if (const auto type = get_keyword_type(); type != token_type::unknown)
+    if (const auto type = get_keyword_type(); type != cc::token_type::unknown)
     {
         return create_token(type);
     }
 
-    return create_token(token_type::identifier);
+    return create_token(cc::token_type::identifier);
 }
 
-void lexer::skip_space()
+void cc::lexer::skip_space()
 {
     while (std::isspace(current()))
     {
@@ -260,7 +263,7 @@ void lexer::skip_space()
     }
 }
 
-token lexer::read_integer()
+cc::token cc::lexer::read_integer()
 {
     while (std::isdigit(current()))
     {
@@ -273,7 +276,7 @@ token lexer::read_integer()
     // Handle special cases
     switch (breaking_char)
     {
-    case chardefs::period:
+    case cc::chardefs::period:
         {
             consume();
             return read_double();
@@ -285,24 +288,14 @@ token lexer::read_integer()
         }
     }
 
-    return create_token(token_type::integer_literal);
+    return create_token(cc::token_type::integer_literal);
 }
 
-token lexer::read_double()
+cc::token cc::lexer::read_double()
 {
-    // Keep track of mantissa length
-    std::size_t mantissa_length = 0;
-
     while (std::isdigit(current()))
     {
-        mantissa_length++;
         consume();
-    }
-
-    // A double must have a mantissa
-    if (mantissa_length == 0)
-    {
-        return read_unknown();
     }
 
     // A non-digit char was hit
@@ -311,7 +304,7 @@ token lexer::read_double()
     // Handle special cases
     switch (breaking_char)
     {
-    case chardefs::period:
+    case cc::chardefs::period:
         {
             return read_unknown();
         }
@@ -327,20 +320,20 @@ token lexer::read_double()
         }
     }
 
-    return create_token(token_type::double_literal);
+    return create_token(cc::token_type::double_literal);
 }
 
-token lexer::read_float()
+cc::token cc::lexer::read_float()
 {
     // This method is only called when current() == 'f',
     // at which point the float token is complete.
-    return create_token(token_type::float_literal);
+    return create_token(cc::token_type::float_literal);
 }
 
-token lexer::read_exponent()
+cc::token cc::lexer::read_exponent()
 {
     // Consume an optional '+' or '-' character
-    if (current() == chardefs::plus || current() == chardefs::dash)
+    if (current() == cc::chardefs::plus || current() == cc::chardefs::dash)
     {
         consume();
     }
@@ -365,43 +358,43 @@ token lexer::read_exponent()
         return read_float();
     }
 
-    return create_token(token_type::double_literal);
+    return create_token(cc::token_type::double_literal);
 }
 
-token lexer::read_unknown()
+cc::token cc::lexer::read_unknown()
 {
-    while (!std::isspace(current()) && current() != chardefs::eof)
+    while (!std::isspace(current()) && current() != cc::chardefs::eof)
     {
         consume();
     }
-    return create_token(token_type::unknown);
+    return create_token(cc::token_type::unknown);
 }
 
 // TODO: Is there a better place to put this?
 
-static const std::unordered_map<std::string_view, token_type> keyword_types =
+static const std::unordered_map<std::string_view, cc::token_type> keyword_types =
 {
-    { keyworddefs::char_keyword,     token_type::char_keyword     },
-    { keyworddefs::int_keyword,      token_type::int_keyword      },
-    { keyworddefs::double_keyword,   token_type::double_keyword   },
-    { keyworddefs::float_keyword,    token_type::float_keyword    },
-    { keyworddefs::struct_keyword,   token_type::struct_keyword   },
-    { keyworddefs::enum_keyword,     token_type::enum_keyword     },
-    { keyworddefs::void_keyword,     token_type::void_keyword     },
-    { keyworddefs::short_keyword,    token_type::short_keyword    },
-    { keyworddefs::long_keyword,     token_type::long_keyword     },
-    { keyworddefs::const_keyword,    token_type::const_keyword    },
-    { keyworddefs::static_keyword,   token_type::static_keyword   },
-    { keyworddefs::if_keyword,       token_type::if_keyword       },
-    { keyworddefs::else_keyword,     token_type::else_keyword     },
-    { keyworddefs::for_keyword,      token_type::for_keyword      },
-    { keyworddefs::while_keyword,    token_type::while_keyword    },
-    { keyworddefs::break_keyword,    token_type::break_keyword    },
-    { keyworddefs::continue_keyword, token_type::continue_keyword },
-    { keyworddefs::return_keyword,   token_type::return_keyword   },
+    { cc::keyworddefs::char_keyword,     cc::token_type::char_keyword     },
+    { cc::keyworddefs::int_keyword,      cc::token_type::int_keyword      },
+    { cc::keyworddefs::double_keyword,   cc::token_type::double_keyword   },
+    { cc::keyworddefs::float_keyword,    cc::token_type::float_keyword    },
+    { cc::keyworddefs::struct_keyword,   cc::token_type::struct_keyword   },
+    { cc::keyworddefs::enum_keyword,     cc::token_type::enum_keyword     },
+    { cc::keyworddefs::void_keyword,     cc::token_type::void_keyword     },
+    { cc::keyworddefs::short_keyword,    cc::token_type::short_keyword    },
+    { cc::keyworddefs::long_keyword,     cc::token_type::long_keyword     },
+    { cc::keyworddefs::const_keyword,    cc::token_type::const_keyword    },
+    { cc::keyworddefs::static_keyword,   cc::token_type::static_keyword   },
+    { cc::keyworddefs::if_keyword,       cc::token_type::if_keyword       },
+    { cc::keyworddefs::else_keyword,     cc::token_type::else_keyword     },
+    { cc::keyworddefs::for_keyword,      cc::token_type::for_keyword      },
+    { cc::keyworddefs::while_keyword,    cc::token_type::while_keyword    },
+    { cc::keyworddefs::break_keyword,    cc::token_type::break_keyword    },
+    { cc::keyworddefs::continue_keyword, cc::token_type::continue_keyword },
+    { cc::keyworddefs::return_keyword,   cc::token_type::return_keyword   },
 };
 
-token_type lexer::get_keyword_type() const
+cc::token_type cc::lexer::get_keyword_type() const
 {
     const std::string text = buffer_.str();
 
@@ -411,6 +404,6 @@ token_type lexer::get_keyword_type() const
     }
     else
     {
-        return token_type::unknown;
+        return cc::token_type::unknown;
     }
 }

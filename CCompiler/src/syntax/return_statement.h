@@ -1,13 +1,17 @@
 #ifndef C_COMPILER_RETURN_STATEMENT_H
 #define C_COMPILER_RETURN_STATEMENT_H
 
-#include "expression.h"
-#include "statement.h"
+#include "token.h"
+#include "syntax/expression.h"
+#include "syntax/statement.h"
+#include "syntax/syntax_type.h"
 
-class return_statement : public statement
+namespace cc {
+
+class return_statement : public cc::statement
 {
 public:
-    explicit return_statement(const token &trigger_token,
+    explicit return_statement(const cc::token &trigger_token,
                               std::unique_ptr<expression> return_expression = nullptr)
         : statement(trigger_token)
         , expression_(std::move(return_expression))
@@ -18,9 +22,9 @@ public:
         }
     }
 
-    syntax_type type() const override
+    cc::syntax_type type() const override
     {
-        return syntax_type::return_statement;
+        return cc::syntax_type::return_statement;
     }
 
     std::string to_string() const override
@@ -31,8 +35,15 @@ public:
                + pos.to_string("<", ">");
     }
 
+    const cc::expression *return_expression() const
+    {
+        return expression_.get();
+    }
+
 private:
-    std::unique_ptr<syntax_node> expression_;
+    std::unique_ptr<cc::expression> expression_;
 };
+
+}
 
 #endif

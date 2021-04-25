@@ -3,13 +3,17 @@
 
 #include "definitions.h"
 #include "token.h"
+#include "token_type.h"
+
 #include <sstream>
 #include <vector>
+
+namespace cc {
 
 class lexer
 {
 public:
-    explicit lexer(const std::string_view text)
+    explicit lexer(std::string_view text)
         : source_(text)
         , index_(0)
         , line_(1)
@@ -18,14 +22,14 @@ public:
     {
     }
 
-    std::vector<token> lex_contents();
+    std::vector<cc::token> lex_contents();
 
 private:
     char current() const
     {
         if (index_ >= source_.size())
         {
-            return chardefs::eof;
+            return cc::chardefs::eof;
         }
         return source_[index_];
     }
@@ -51,24 +55,31 @@ private:
 
     void skip_space();
 
-    token next_token();
-    token read_string();
-    token read_escaped();
-    token read_identifier();
-    token read_integer();
-    token read_double();
-    token read_float();
-    token read_exponent();
-    token read_unknown();
+    // TODO: Read line comment
+    // TODO: Read multiline comment
+    // TODO: Read char literal
+    cc::token next_token();
+    cc::token read_string();
+    cc::token read_escaped();
+    cc::token read_identifier();
+    cc::token read_integer();
+    cc::token read_double();
+    cc::token read_float();
+    cc::token read_exponent();
+    cc::token read_unknown();
 
-    token_type get_keyword_type() const;
+    cc::token_type get_keyword_type() const;
 
-    token create_token(const token_type type)
+    cc::token create_token(cc::token_type type)
     {
         const std::string text = buffer_.str();
         buffer_.str(std::string());
         buffer_.clear();
-        return token(type, line_, start_column_, text);
+        return {
+            .type = type,
+            .text = text,
+            .pos = { line_, start_column_ },
+        };
     }
 
 private:
@@ -82,4 +93,6 @@ private:
     std::size_t start_column_;
 };
 
-#endif // !C_COMPILER_LEXER_H
+}
+
+#endif

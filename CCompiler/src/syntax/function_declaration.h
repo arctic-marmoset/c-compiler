@@ -1,15 +1,19 @@
 #ifndef C_COMPILER_FUNCTION_DECLARATION_H
 #define C_COMPILER_FUNCTION_DECLARATION_H
 
+#include "token.h"
 #include "syntax/compound_statement.h"
 #include "syntax/declaration.h"
+#include "syntax/syntax_type.h"
 
-class function_declaration : public declaration
+namespace cc {
+
+class function_declaration : public cc::declaration
 {
 public:
-    function_declaration(const token &type_specifier,
-                         const token &identifier,
-                         std::unique_ptr<compound_statement> definition = nullptr,
+    function_declaration(const cc::token &type_specifier,
+                         const cc::token &identifier,
+                         std::unique_ptr<cc::compound_statement> definition = nullptr,
                          bool is_redeclared = false)
         : declaration(type_specifier)
         , type_specifier_(type_specifier)
@@ -23,9 +27,9 @@ public:
         }
     }
 
-    syntax_type type() const override
+    cc::syntax_type type() const override
     {
-        return syntax_type::function_declaration;
+        return cc::syntax_type::function_declaration;
     }
 
     std::string to_string() const override
@@ -41,7 +45,7 @@ public:
             ss << "prev ";
         }
 
-        ss << pos.to_string("<", ">")          + " " 
+        ss << pos.to_string("<", ">")          + " "
             + identifier_.get().text           + " "
               "'" + type_specifier_.get().text + " "
               "(";
@@ -53,11 +57,23 @@ public:
         return ss.str();
     }
 
+    std::string identifier() const
+    {
+        return identifier_.get().text;
+    }
+
+    const std::vector<cc::syntax_node *> &definition() const
+    {
+        return definition_->children();
+    }
+
 private:
-    const_reference<token> type_specifier_;
-    const_reference<token> identifier_;
-    std::unique_ptr<compound_statement> definition_;
+    const_reference<cc::token> type_specifier_;
+    const_reference<cc::token> identifier_;
+    std::unique_ptr<cc::compound_statement> definition_;
     bool is_redeclared_;
 };
+
+}
 
 #endif

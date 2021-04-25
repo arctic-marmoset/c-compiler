@@ -4,12 +4,15 @@
 #include <iostream>
 #include <type_traits>
 
+namespace cc {
+
 enum class token_type
 {
     integer_literal = 0,
     double_literal,
     float_literal,
     string_literal,
+    char_literal,
 
     char_keyword,
     int_keyword,
@@ -81,9 +84,11 @@ enum class token_type
     unknown
 };
 
-inline std::ostream &operator<<(std::ostream &os, token_type type)
-{
-    return os << static_cast<std::underlying_type_t<token_type>>(type);
 }
 
-#endif // !C_COMPILER_TOKEN_TYPE_H
+inline std::ostream &operator<<(std::ostream &os, cc::token_type type)
+{
+    return os << static_cast<std::underlying_type_t<cc::token_type>>(type);
+}
+
+#endif

@@ -2,24 +2,28 @@
 #define C_COMPILER_PARSER_H
 
 #include "symbol_table.h"
-#include "syntax/compound_statement.h"
-#include "syntax/translation_unit_declaration.h"
 #include "token.h"
-#include <vector>
+#include "token_type.h"
+#include "syntax/translation_unit_declaration.h"
+
+#include <memory>
 #include <stack>
+#include <vector>
 
-class syntax_node;
-class declaration;
-class expression;
-class primary_expression;
+namespace cc {
+
 class binary_expression;
-class parenthesized_expression;
-class variable_declaration;
-class function_declaration;
+class compound_statement;
+class declaration;
 class declaration_reference_expression;
+class expression;
+class function_declaration;
+class primary_expression;
+class parenthesized_expression;
 class return_statement;
-
-// TODO: Implement better error handling and reporting
+class statement;
+class syntax_node;
+class variable_declaration;
 
 class parser
 {
@@ -27,25 +31,25 @@ class parser
     using const_reference = std::reference_wrapper<const T>;
 
 public:
-    explicit parser(const std::vector<token> &tokens)
+    explicit parser(const std::vector<cc::token> &tokens)
         : index_(0)
         , tokens_(tokens)
         , scope_({ &symbols_ })
     {
     }
 
-    std::unique_ptr<syntax_node> parse_contents()
+    std::unique_ptr<cc::syntax_node> parse_contents()
     {
         return parse_translation_unit();
     }
 
 private:
-    const token &current_token() const
+    const cc::token &current_token() const
     {
         return tokens_.get()[index_];
     }
 
-    const token &peek_token(std::size_t lookahead)
+    const cc::token &peek_token(std::size_t lookahead)
     {
         const auto peekIndex = index_ + lookahead;
         if (peekIndex <= tokens_.get().size())
@@ -72,7 +76,7 @@ private:
      * @param[in] type The `token_type` that the current token should match.
      * @return         `true` if the current token was consumed. `false` otherwise.
      */
-    bool consume(token_type type)
+    bool consume(cc::token_type type)
     {
         const bool matched = match(type);
 
@@ -84,53 +88,45 @@ private:
         return matched;
     }
 
-    /**
-     * @brief Matches the current token against a single `token_type`.
-     *
-     * @param[in] first The `token_type` to match.
-     * @return          `true` if matches. `false` otherwise.
-     */
-    bool match(const token_type &first) const
-    {
-        return current_token().type == first;
-    }
-
     template <typename... Ts>
-    using are_token_types = std::conjunction<std::is_same<Ts, token_type>...>;
+    using are_token_types = std::conjunction<std::is_same<Ts, cc::token_type>...>;
 
     /**
      * @brief Matches the current token against a variable number of `token_type` arguments.
      *
-     * @param[in] first The first token to match.
-     * @param[in] rest  The remaining tokens to match.
+     * @param[in] types  The tokens to match.
      * @return    `true` if at least one of the arguments matches. `false` otherwise.
      */
     template <typename... Args, typename = std::enable_if_t<are_token_types<Args...>::value>>
-    bool match(const token_type &first, const Args &... rest) const
+    bool match(const Args &...types) const
     {
-        return match(first) || match(rest...);
+        return ((current_token().type == types) || ...);
     }
 
-    std::unique_ptr<variable_declaration>             parse_variable_declaration(const token &type_specifier, const token &identifier);
-    std::unique_ptr<function_declaration>             parse_function_declaration(const token &type_specifier, const token &identifier);
-    std::unique_ptr<declaration>                      parse_declaration();
-    std::unique_ptr<primary_expression>               parse_literal();
-    std::unique_ptr<parenthesized_expression>         parse_parenthesized_expression();
-    std::unique_ptr<declaration_reference_expression> parse_declaration_reference_expression();
-    std::unique_ptr<primary_expression>               parse_primary_expression();
-    std::unique_ptr<binary_expression>                parse_binary_expression();
-    std::unique_ptr<expression>                       parse_expression();
-    std::unique_ptr<return_statement>                 parse_return_statement();
-    std::unique_ptr<compound_statement>               parse_compound_statement();
-    std::unique_ptr<statement>                        parse_expression_statement();
-    std::unique_ptr<statement>                        parse_statement();
-    std::unique_ptr<translation_unit_declaration>     parse_translation_unit();
+    std::unique_ptr<cc::variable_declaration>             parse_variable_declaration(const cc::token &type_specifier, const cc::token &identifier);
+    std::unique_ptr<cc::function_declaration>             parse_function_declaration(const cc::token &type_specifier, const cc::token &identifier);
+    std::unique_ptr<cc::declaration>                      parse_declaration();
+    std::unique_ptr<cc::primary_expression>               parse_literal();
+    std::unique_ptr<cc::parenthesized_expression>         parse_parenthesized_expression();
+    std::unique_ptr<cc::declaration_reference_expression> parse_declaration_reference_expression();
+    std::unique_ptr<cc::primary_expression>               parse_primary_expression();
+    std::unique_ptr<cc::binary_expression>                parse_binary_expression();
+    std::unique_ptr<cc::expression>                       parse_expression();
+    std::unique_ptr<cc::return_statement>                 parse_return_statement();
+    std::unique_ptr<cc::compound_statement>               parse_compound_statement();
+    std::unique_ptr<cc::statement>                        parse_expression_statement();
+    std::unique_ptr<cc::statement>                        parse_statement();
+    std::unique_ptr<cc::translation_unit_declaration>     parse_translation_unit();
 
 private:
     std::size_t index_;
-    const_reference<std::vector<token>> tokens_;
-    symbol_table symbols_;
-    std::stack<symbol_table *> scope_;
+    const_reference<std::vector<cc::token>> tokens_;
+    cc::symbol_table symbols_;
+    std::stack<cc::symbol_table *> scope_;
 };
+
+}
+
+// TODO: Implement better error handling and reporting
 
 #endif

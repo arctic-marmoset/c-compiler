@@ -1,26 +1,32 @@
 #ifndef C_COMPILER_COMPOUND_STATEMENT_H
 #define C_COMPILER_COMPOUND_STATEMENT_H
 
-#include "statement.h"
+#include "token.h"
+#include "syntax/statement.h"
+#include "syntax/syntax_type.h"
 
-class compound_statement : public statement
+#include <memory>
+
+namespace cc {
+
+class compound_statement : public cc::statement
 {
 public:
-    compound_statement(const token &trigger_token)
+    explicit compound_statement(const cc::token &trigger_token)
         : statement(trigger_token)
         , has_return_(false)
     {
     }
 
-    void add_statement(std::unique_ptr<syntax_node> statement)
+    void add_statement(std::unique_ptr<cc::statement> statement)
     {
         statements_.emplace_back(std::move(statement));
         children_.push_back(statements_.back().get());
     }
 
-    syntax_type type() const override
+    cc::syntax_type type() const override
     {
-        return syntax_type::compound_statement;
+        return cc::syntax_type::compound_statement;
     }
 
     std::string to_string() const override
@@ -42,8 +48,10 @@ public:
     }
 
 private:
-    std::vector<std::unique_ptr<syntax_node>> statements_;
+    std::vector<std::unique_ptr<cc::statement>> statements_;
     bool has_return_;
 };
+
+}
 
 #endif

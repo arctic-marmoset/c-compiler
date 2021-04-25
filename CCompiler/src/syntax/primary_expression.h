@@ -1,12 +1,15 @@
 #ifndef C_COMPILER_PRIMARY_EXPRESSION_H
 #define C_COMPILER_PRIMARY_EXPRESSION_H
 
-#include "expression.h"
+#include "token.h"
+#include "syntax/expression.h"
 
-class primary_expression : public expression
+namespace cc {
+
+class primary_expression : public cc::expression
 {
 public:
-    ~primary_expression() = default;
+    ~primary_expression() override = default;
 
     primary_expression(const primary_expression &) = delete;
     primary_expression(primary_expression &&) = delete;
@@ -14,10 +17,12 @@ public:
     primary_expression &operator=(primary_expression &&) = delete;
 
 protected:
-    primary_expression(const token &trigger_token)
+    explicit primary_expression(const cc::token &trigger_token)
         : expression(trigger_token)
     {
     }
 };
+
+}
 
 #endif

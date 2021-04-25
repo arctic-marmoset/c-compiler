@@ -1,12 +1,15 @@
 #ifndef C_COMPILER_STATEMENT_H
 #define C_COMPILER_STATEMENT_H
 
+#include "token.h"
 #include "syntax/syntax_node.h"
 
-class statement : public syntax_node
+namespace cc {
+
+class statement : public cc::syntax_node
 {
 public:
-    ~statement() = default;
+    ~statement() override = default;
 
     statement(const statement &) = delete;
     statement(statement &&) = delete;
@@ -14,10 +17,12 @@ public:
     statement &operator=(statement &&) = delete;
 
 protected:
-    statement(const token &trigger_token)
+    explicit statement(const cc::token &trigger_token)
         : syntax_node(trigger_token)
     {
     }
 };
+
+}
 
 #endif

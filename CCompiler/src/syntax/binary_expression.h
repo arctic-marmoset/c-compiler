@@ -1,26 +1,30 @@
 #ifndef C_COMPILER_BINARY_EXPRESSION_H
 #define C_COMPILER_BINARY_EXPRESSION_H
 
-#include "expression.h"
+#include "token.h"
+#include "syntax/expression.h"
+#include "syntax/syntax_type.h"
 
-class binary_expression : public expression
+namespace cc {
+
+class binary_expression : public cc::expression
 {
 public:
-    binary_expression(std::unique_ptr<expression> left,
-                      const token &op,
-                      std::unique_ptr<expression> right)
+    binary_expression(const cc::token &op,
+                      std::unique_ptr<cc::expression> left,
+                      std::unique_ptr<cc::expression> right)
         : expression(left->trigger_token())
+        , operator_(op)
         , left_(std::move(left))
         , right_(std::move(right))
-        , operator_(op)
     {
         children_.push_back(left_.get());
         children_.push_back(right_.get());
     }
 
-    syntax_type type() const override
+    cc::syntax_type type() const override
     {
-        return syntax_type::binary_expression;
+        return cc::syntax_type::binary_expression;
     }
 
     std::string to_string() const override
@@ -33,9 +37,11 @@ public:
     }
 
 private:
-    std::unique_ptr<expression> left_;
-    std::unique_ptr<expression> right_;
-    const_reference<token> operator_;
+    const_reference<cc::token> operator_;
+    std::unique_ptr<cc::expression> left_;
+    std::unique_ptr<cc::expression> right_;
 };
+
+}
 
 #endif

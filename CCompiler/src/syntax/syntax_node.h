@@ -1,9 +1,13 @@
 #ifndef C_COMPILER_SYNTAX_NODE_H
 #define C_COMPILER_SYNTAX_NODE_H
 
-#include "syntax/syntax_type.h"
 #include "token.h"
+#include "syntax/syntax_type.h"
+
+#include <functional>
 #include <vector>
+
+namespace cc {
 
 class syntax_node
 {
@@ -12,18 +16,11 @@ protected:
     using const_reference = std::reference_wrapper<const T>;
 
 public:
-    virtual ~syntax_node() = default;
-
-    syntax_node(const syntax_node &) = delete;
-    syntax_node(syntax_node &&) = delete;
-    syntax_node &operator=(const syntax_node &) = delete;
-    syntax_node &operator=(syntax_node &&) = delete;
-
     /**
      * @brief  Returns the type of this node.
      * @return The type of this node.
      */
-    virtual syntax_type type() const = 0;
+    virtual cc::syntax_type type() const = 0;
 
     /**
      * @brief  Constructs an std::string that describes this node.
@@ -31,7 +28,7 @@ public:
      */
     virtual std::string to_string() const = 0;
 
-    source_position source_position() const
+    cc::source_position source_position() const
     {
         return trigger_token().pos;
     }
@@ -47,23 +44,21 @@ public:
     }
 
     /**
-     * @brief Constructs an std::string that depicts this node and all its children in the
-     *        form of a pretty-printed tree.
+     * @brief Constructs an std::string that depicts this node and all its children in the form of a
+     *        pretty-printed tree.
      *
      * @param[in] indent A string that determines what the indent for this node looks like.
      *
-     * @param[in] last   Whether this node should be considered to be the last out of its
-     *                   siblings. Affects the visual representation of the branch leading
-     *                   to this node.
+     * @param[in] last   Whether this node should be considered to be the last out of its siblings.
+     *                   Affects the visual representation of the branch leading to this node.
      *
-     * @param[in] root   Whether this node should be considered to be the root node. Affects
-     *                   whether this node will be prefixed by a visual representation of a
-     *                   branch.
+     * @param[in] root   Whether this node should be considered to be the root node. Affects whether
+     *                   this node will be prefixed by a visual representation of a branch.
      *
      * @return           A visual representation of the syntax tree rooted at this node.
      */
     virtual std::string tree_representation(std::string indent = std::string(),
-                                            bool last = true, 
+                                            bool last = true,
                                             bool root = true) const
     {
         std::ostringstream ss;
@@ -101,15 +96,24 @@ public:
         return ss.str();
     }
 
+    virtual ~syntax_node() = default;
+
+    syntax_node(const syntax_node &) = delete;
+    syntax_node(syntax_node &&) = delete;
+    syntax_node &operator=(const syntax_node &) = delete;
+    syntax_node &operator=(syntax_node &&) = delete;
+
 protected:
-    syntax_node(const token &trigger_token)
+    explicit syntax_node(const cc::token &trigger_token)
         : trigger_token_(trigger_token)
     {
     }
 
 protected:
     std::vector<syntax_node *> children_;
-    const_reference<token> trigger_token_;
+    const_reference<cc::token> trigger_token_;
 };
+
+}
 
 #endif
