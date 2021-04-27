@@ -84,7 +84,7 @@ enum class token_type
     unknown
 };
 
-}
+} // namespace cc
 
 inline std::ostream &operator<<(std::ostream &os, cc::token_type type)
 {

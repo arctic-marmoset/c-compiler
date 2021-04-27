@@ -13,7 +13,7 @@ class compound_statement : public cc::statement
 {
 public:
     explicit compound_statement(const cc::token &trigger_token)
-        : statement(trigger_token)
+        : cc::statement(trigger_token)
         , has_return_(false)
     {
     }
@@ -42,9 +42,9 @@ public:
         return has_return_;
     }
 
-    void set_has_return(bool has_return)
+    void has_return(bool returns)
     {
-        has_return_ = has_return;
+        has_return_ = returns;
     }
 
 private:
@@ -52,6 +52,6 @@ private:
     bool has_return_;
 };
 
-}
+} // namespace cc
 
 #endif

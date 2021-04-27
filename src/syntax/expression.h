@@ -18,11 +18,11 @@ public:
 
 protected:
     explicit expression(const cc::token &trigger_token)
-        : statement(trigger_token)
+        : cc::statement(trigger_token)
     {
     }
 };
 
-}
+} // namespace cc
 
 #endif

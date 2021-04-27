@@ -34,7 +34,7 @@ public:
     explicit parser(const std::vector<cc::token> &tokens)
         : index_(0)
         , tokens_(tokens)
-        , scope_({ &symbols_ })
+        , scope_({&symbols_})
     {
     }
 
@@ -51,15 +51,14 @@ private:
 
     const cc::token &peek_token(std::size_t lookahead)
     {
-        const auto peekIndex = index_ + lookahead;
-        if (peekIndex <= tokens_.get().size())
+        const auto peek_index = index_ + lookahead;
+
+        if (peek_index <= tokens_.get().size())
         {
-            return tokens_.get()[peekIndex];
+            return tokens_.get()[peek_index];
         }
-        else
-        {
-            return tokens_.get().back();
-        }
+
+        return tokens_.get().back();
     }
 
     void advance()
@@ -103,6 +102,7 @@ private:
         return ((current_token().type == types) || ...);
     }
 
+    // clang-format off
     std::unique_ptr<cc::variable_declaration>             parse_variable_declaration(const cc::token &type_specifier, const cc::token &identifier);
     std::unique_ptr<cc::function_declaration>             parse_function_declaration(const cc::token &type_specifier, const cc::token &identifier);
     std::unique_ptr<cc::declaration>                      parse_declaration();
@@ -117,6 +117,7 @@ private:
     std::unique_ptr<cc::statement>                        parse_expression_statement();
     std::unique_ptr<cc::statement>                        parse_statement();
     std::unique_ptr<cc::translation_unit_declaration>     parse_translation_unit();
+    // clang-format on
 
 private:
     std::size_t index_;
@@ -125,7 +126,7 @@ private:
     std::stack<cc::symbol_table *> scope_;
 };
 
-}
+} // namespace cc
 
 // TODO: Implement better error handling and reporting
 

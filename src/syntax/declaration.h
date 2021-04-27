@@ -10,6 +10,8 @@ namespace cc {
 class declaration : public cc::statement
 {
 public:
+    ~declaration() override = default;
+
     declaration(const declaration &) = delete;
     declaration(declaration &&) = delete;
     declaration &operator=(const declaration &) = delete;
@@ -17,11 +19,11 @@ public:
 
 protected:
     explicit declaration(const cc::token &trigger_token)
-        : statement(trigger_token)
+        : cc::statement(trigger_token)
     {
     }
 };
 
-}
+} // namespace cc
 
 #endif

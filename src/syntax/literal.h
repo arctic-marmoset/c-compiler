@@ -93,7 +93,7 @@ public:
     }
 };
 
-}
+} // namespace cc
 
 // Undef to avoid polluting global namespace
 #undef DECLARE_LITERAL_SYNTAX_NODE

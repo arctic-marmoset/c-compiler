@@ -6,18 +6,20 @@
 #include "syntax/declaration.h"
 #include "syntax/syntax_type.h"
 
+#include <utility>
+
 namespace cc {
 
 class function_declaration : public cc::declaration
 {
 public:
     function_declaration(const cc::token &type_specifier,
-                         const cc::token &identifier,
+                         cc::token identifier,
                          std::unique_ptr<cc::compound_statement> definition = nullptr,
                          bool is_redeclared = false)
-        : declaration(type_specifier)
+        : cc::declaration(type_specifier)
         , type_specifier_(type_specifier)
-        , identifier_(identifier)
+        , identifier_(std::move(identifier))
         , definition_(std::move(definition))
         , is_redeclared_(is_redeclared)
     {
@@ -36,18 +38,18 @@ public:
     {
         std::ostringstream ss;
 
-        const auto &pos = trigger_token_.get().pos;
+        const auto &pos = trigger_token().pos;
 
-        ss << "function_declaration"     " ";
+        ss << "function_declaration ";
 
         if (is_redeclared_)
         {
             ss << "prev ";
         }
 
-        ss << pos.to_string("<", ">")          + " "
-            + identifier_.get().text           + " "
-              "'" + type_specifier_.get().text + " "
+        ss << pos.to_string("<", ">")    + " "
+            + identifier_.text           + " "
+              "'" + type_specifier_.text + " "
               "(";
 
         // TODO: Add parameters to ss
@@ -59,21 +61,21 @@ public:
 
     std::string identifier() const
     {
-        return identifier_.get().text;
+        return identifier_.text;
     }
 
-    const std::vector<cc::syntax_node *> &definition() const
+    const std::unique_ptr<cc::compound_statement> &definition() const
     {
-        return definition_->children();
+        return definition_;
     }
 
 private:
-    const_reference<cc::token> type_specifier_;
-    const_reference<cc::token> identifier_;
+    cc::token type_specifier_;
+    cc::token identifier_;
     std::unique_ptr<cc::compound_statement> definition_;
     bool is_redeclared_;
 };
 
-}
+} // namespace cc
 
 #endif

@@ -15,7 +15,7 @@ class translation_unit_declaration : public cc::syntax_node
 public:
     translation_unit_declaration(const cc::token &trigger_token,
                                  std::vector<std::unique_ptr<cc::declaration>> declarations)
-        : syntax_node(trigger_token)
+        : cc::syntax_node(trigger_token)
         , declarations_(std::move(declarations))
     {
         for (const auto &decl : declarations_)
@@ -38,6 +38,6 @@ private:
     std::vector<std::unique_ptr<cc::declaration>> declarations_;
 };
 
-}
+} // namespace cc
 
 #endif

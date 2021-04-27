@@ -13,7 +13,7 @@ class parenthesized_expression : public cc::primary_expression
 public:
     parenthesized_expression(const cc::token &trigger_token,
                              std::unique_ptr<cc::expression> enclosed_expression)
-        : primary_expression(trigger_token)
+        : cc::primary_expression(trigger_token)
         , enclosed_expression_(std::move(enclosed_expression))
     {
         children_.push_back(enclosed_expression_.get());
@@ -28,14 +28,13 @@ public:
     {
         const auto &pos = trigger_token().pos;
 
-        return "parenthesized_expression"  " "
-               + pos.to_string("<", ">");
+        return "parenthesized_expression " + pos.to_string("<", ">");
     }
 
 private:
     std::unique_ptr<cc::expression> enclosed_expression_;
 };
 
-}
+} // namespace cc
 
 #endif

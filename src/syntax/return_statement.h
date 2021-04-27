@@ -13,7 +13,7 @@ class return_statement : public cc::statement
 public:
     explicit return_statement(const cc::token &trigger_token,
                               std::unique_ptr<expression> return_expression = nullptr)
-        : statement(trigger_token)
+        : cc::statement(trigger_token)
         , expression_(std::move(return_expression))
     {
         if (expression_)
@@ -44,6 +44,6 @@ private:
     std::unique_ptr<cc::expression> expression_;
 };
 
-}
+} // namespace cc
 
 #endif

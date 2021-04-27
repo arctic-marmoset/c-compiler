@@ -14,8 +14,7 @@ struct source_position
     std::size_t line;
     std::size_t column;
 
-    std::string to_string(const std::string &open = "(",
-                          const std::string &close = ")") const
+    std::string to_string(const std::string &open = "(", const std::string &close = ")") const
     {
         std::ostringstream ss;
         ss << open << line << "," << column << close;
@@ -25,12 +24,12 @@ struct source_position
 
 struct token
 {
-    const cc::token_type type;
-    const std::string text;
-    const source_position pos;
+    cc::token_type type;
+    std::string text;
+    cc::source_position pos;
 };
 
-}
+} // namespace cc
 
 inline std::ostream &operator<<(std::ostream &os, cc::source_position pos)
 {

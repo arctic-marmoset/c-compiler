@@ -20,6 +20,6 @@ enum class syntax_type
     translation_unit_declaration,
 };
 
-}
+} // namespace cc
 
 #endif

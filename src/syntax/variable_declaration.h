@@ -6,17 +6,19 @@
 #include "syntax/expression.h"
 #include "syntax/syntax_type.h"
 
+#include <utility>
+
 namespace cc {
 
 class variable_declaration : public cc::declaration
 {
 public:
     variable_declaration(const cc::token &type_specifier,
-                         const cc::token &identifier,
+                         cc::token identifier,
                          std::unique_ptr<cc::expression> initializer = nullptr)
-        : declaration(type_specifier)
+        : cc::declaration(type_specifier)
         , type_specifier_(type_specifier)
-        , identifier_(identifier)
+        , identifier_(std::move(identifier))
         , initializer_(std::move(initializer))
     {
         if (initializer_)
@@ -36,10 +38,10 @@ public:
 
         const auto &pos = trigger_token().pos;
 
-        ss << "variable_declaration"      " "
-              + pos.to_string("<", ">") + " "
-              + identifier_.get().text  + " "
-                "'" + type_specifier_.get().text + "'";
+        ss << "variable_declaration"         " "
+              + pos.to_string("<", ">")    + " "
+              + identifier_.text           + " "
+                "'" + type_specifier_.text + "'";
 
         if (initializer_)
         {
@@ -50,11 +52,11 @@ public:
     }
 
 private:
-    const_reference<cc::token> type_specifier_;
-    const_reference<cc::token> identifier_;
+    cc::token type_specifier_;
+    cc::token identifier_;
     std::unique_ptr<cc::expression> initializer_;
 };
 
-}
+} // namespace cc
 
 #endif

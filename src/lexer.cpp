@@ -1,4 +1,5 @@
 #include "lexer.h"
+
 #include "token.h"
 #include "token_type.h"
 
@@ -14,6 +15,7 @@ std::vector<cc::token> cc::lexer::lex_contents()
         tokens.push_back(next_token());
     }
 
+    tokens.push_back(create_token(cc::token_type::eof));
     return tokens;
 }
 
@@ -154,6 +156,7 @@ cc::token cc::lexer::read_string()
 {
     // TODO: Report missing closing quote as error
 
+    // clang-format off
     while (current() != cc::chardefs::quote &&
            current() != cc::chardefs::backslash &&
            current() != cc::chardefs::cr &&
@@ -162,6 +165,7 @@ cc::token cc::lexer::read_string()
     {
         consume();
     }
+    // clang-format on
 
     const char breaking_char = current();
 
@@ -190,6 +194,8 @@ cc::token cc::lexer::read_string()
         {
             return create_token(cc::token_type::unknown);
         }
+    default:
+        break;
     }
 
     return create_token(cc::token_type::string_literal);
@@ -233,6 +239,8 @@ cc::token cc::lexer::read_escaped()
             handle_newline();
             break;
         }
+    default:
+        break;
     }
 
     // If no cases matched, ignore backslash
@@ -286,6 +294,8 @@ cc::token cc::lexer::read_integer()
             consume();
             return read_exponent();
         }
+    default:
+        break;
     }
 
     return create_token(cc::token_type::integer_literal);
@@ -318,6 +328,8 @@ cc::token cc::lexer::read_double()
             consume();
             return read_float();
         }
+    default:
+        break;
     }
 
     return create_token(cc::token_type::double_literal);
@@ -372,6 +384,7 @@ cc::token cc::lexer::read_unknown()
 
 // TODO: Is there a better place to put this?
 
+// clang-format off
 static const std::unordered_map<std::string_view, cc::token_type> keyword_types =
 {
     { cc::keyworddefs::char_keyword,     cc::token_type::char_keyword     },
@@ -393,6 +406,7 @@ static const std::unordered_map<std::string_view, cc::token_type> keyword_types 
     { cc::keyworddefs::continue_keyword, cc::token_type::continue_keyword },
     { cc::keyworddefs::return_keyword,   cc::token_type::return_keyword   },
 };
+// clang-format on
 
 cc::token_type cc::lexer::get_keyword_type() const
 {
@@ -402,8 +416,6 @@ cc::token_type cc::lexer::get_keyword_type() const
     {
         return it->second;
     }
-    else
-    {
-        return cc::token_type::unknown;
-    }
+
+    return cc::token_type::unknown;
 }

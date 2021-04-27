@@ -10,8 +10,8 @@ namespace cc {
 class declaration_reference_expression : public cc::primary_expression
 {
 public:
-    declaration_reference_expression(const cc::token &trigger_token)
-        : primary_expression(trigger_token)
+    explicit declaration_reference_expression(const cc::token &trigger_token)
+        : cc::primary_expression(trigger_token)
     {
     }
 
@@ -30,6 +30,6 @@ public:
     }
 };
 
-}
+} // namespace cc
 
 #endif

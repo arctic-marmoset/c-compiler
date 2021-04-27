@@ -27,7 +27,7 @@ inline constexpr std::string_view continue_keyword = "continue";
 
 inline constexpr std::string_view return_keyword = "return";
 
-}
+} // namespace cc::keyworddefs
 
 namespace cc::chardefs {
 
@@ -74,6 +74,6 @@ inline constexpr char cr = '\r';
 inline constexpr char lf = '\n';
 inline constexpr char eof = '\0';
 
-}
+} // namespace cc::chardefs
 
 #endif

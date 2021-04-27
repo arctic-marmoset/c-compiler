@@ -1,4 +1,5 @@
 #include "parser.h"
+
 #include "symbol_table.h"
 #include "token.h"
 #include "token_type.h"
@@ -75,7 +76,7 @@ std::unique_ptr<cc::declaration_reference_expression> cc::parser::parse_declarat
         throw std::runtime_error("Expected an lvalue");
     }
 
-    if (!scope_.top()->has_declared(identifier.text))
+    if (!scope_.top()->is_declared(identifier.text))
     {
         throw std::runtime_error("Identifier '" + identifier.text + "' is undefined");
     }
@@ -142,7 +143,7 @@ std::unique_ptr<cc::compound_statement> cc::parser::parse_compound_statement()
 
     if (!consume(cc::token_type::open_brace))
     {
-        throw std::runtime_error("Expected a '{'");
+        throw std::runtime_error("Expected a ';' or a '{'");
     }
 
     auto statements = std::make_unique<cc::compound_statement>(start);
@@ -161,7 +162,7 @@ std::unique_ptr<cc::compound_statement> cc::parser::parse_compound_statement()
         statements->add_statement(std::move(stmt));
     }
 
-    statements->set_has_return(has_return_statement);
+    statements->has_return(has_return_statement);
     scope_.pop();
 
     return statements;
@@ -170,9 +171,9 @@ std::unique_ptr<cc::compound_statement> cc::parser::parse_compound_statement()
 std::unique_ptr<cc::variable_declaration> cc::parser::parse_variable_declaration(const cc::token &type_specifier,
                                                                                  const cc::token &identifier)
 {
-    if (scope_.top()->has_declared_in_scope(identifier.text))
+    if (scope_.top()->is_declared_in_scope(identifier.text))
     {
-        throw std::runtime_error("Redefinition of " + identifier.text);
+        throw std::runtime_error("Redefinition of " + identifier.text + "\nFirst declaration at ");
     }
 
     scope_.top()->declare(identifier.text);
@@ -184,7 +185,7 @@ std::unique_ptr<cc::variable_declaration> cc::parser::parse_variable_declaration
 
     if (!consume(cc::token_type::assign))
     {
-        throw std::runtime_error("Expected a '='");
+        throw std::runtime_error("Expected a ';' or a '='");
     }
 
     auto initializer = parse_expression();
@@ -196,7 +197,7 @@ std::unique_ptr<cc::variable_declaration> cc::parser::parse_variable_declaration
 
     scope_.top()->define(identifier.text, true);
 
-    return std::make_unique<variable_declaration>(
+    return std::make_unique<cc::variable_declaration>(
         type_specifier,
         identifier,
         std::move(initializer)
@@ -218,7 +219,7 @@ std::unique_ptr<cc::function_declaration> cc::parser::parse_function_declaration
         throw std::runtime_error("Expected a ')'");
     }
 
-    bool is_redeclared = scope_.top()->has_declared(identifier.text);
+    bool is_redeclared = scope_.top()->is_declared(identifier.text);
 
     if (!is_redeclared)
     {
@@ -235,7 +236,7 @@ std::unique_ptr<cc::function_declaration> cc::parser::parse_function_declaration
         );
     }
 
-    if (scope_.top()->has_defined(identifier.text))
+    if (scope_.top()->is_defined(identifier.text))
     {
         throw std::runtime_error("Redefinition of " + identifier.text);
     }
@@ -265,8 +266,7 @@ std::unique_ptr<cc::binary_expression> cc::parser::parse_binary_expression()
 
     const auto &op = current_token();
 
-    if (!consume(cc::token_type::plus) &&
-        !consume(cc::token_type::assign))
+    if (!consume(cc::token_type::plus) && !consume(cc::token_type::assign))
     {
         throw std::runtime_error("Expected a binary operator");
     }
@@ -280,15 +280,12 @@ std::unique_ptr<cc::expression> cc::parser::parse_expression()
 {
     const auto &next = peek_token(1);
 
-    if (next.type == cc::token_type::plus ||
-        next.type == cc::token_type::assign)
+    if (next.type == cc::token_type::plus || next.type == cc::token_type::assign)
     {
         return parse_binary_expression();
     }
-    else
-    {
-        return parse_primary_expression();
-    }
+
+    return parse_primary_expression();
 }
 
 std::unique_ptr<cc::statement> cc::parser::parse_expression_statement()
@@ -338,10 +335,8 @@ std::unique_ptr<cc::declaration> cc::parser::parse_declaration()
     {
         return parse_function_declaration(type_specifier, identifier);
     }
-    else
-    {
-        return parse_variable_declaration(type_specifier, identifier);
-    }
+
+    return parse_variable_declaration(type_specifier, identifier);
 }
 
 std::unique_ptr<cc::translation_unit_declaration> cc::parser::parse_translation_unit()

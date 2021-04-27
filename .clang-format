@@ -1,0 +1,27 @@
+AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AlignEscapedNewlines: Left
+AlignOperands: Align
+AlwaysBreakTemplateDeclarations: Yes
+BasedOnStyle: Microsoft
+BinPackArguments: false
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: BeforeComma
+BraceWrapping:
+    AfterCaseLabel: true
+    AfterClass: true
+    AfterControlStatement: Always
+    AfterEnum: true
+    AfterExternBlock: false
+    AfterFunction: true
+    AfterNamespace: false
+    AfterObjCDeclaration: true
+    AfterStruct: true
+    AfterUnion: true
+ColumnLimit: 100
+Cpp11BracedListStyle: true
+IncludeBlocks: Regroup
+IndentCaseBlocks: true
+IndentExternBlock: NoIndent
+IndentWidth: 4
+NamespaceIndentation: None

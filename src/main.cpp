@@ -7,6 +7,10 @@
 #include <fstream>
 #include <iomanip>
 
+constexpr int position_column_width = 8;
+constexpr int type_column_width = 5;
+constexpr int text_column_width = 20;
+
 // TODO: Clean up interactive console vs cmdline exec selection
 // TODO: Remove code duplication between run and run_debug
 void run(const std::string &file_name);
@@ -44,9 +48,9 @@ void run_debug()
         std::cout << "== TOKENS ==" << "\n\n";
         for (const auto &token : tokens)
         {
-            std::cout << std::left << std::setw(8)  << token.pos.to_string()
-                                   << std::setw(5)  << token.type
-                                   << std::setw(20) << token.text << '\n';
+            std::cout << std::left << std::setw(position_column_width) << token.pos.to_string()
+                                   << std::setw(type_column_width)     << token.type
+                                   << std::setw(text_column_width)     << token.text << '\n';
         }
         std::cout << '\n';
 
@@ -75,11 +79,11 @@ void run(const std::string &file_name)
 
     if (!in)
     {
-        std::cout << "Invalid filename \"" << file_name <<"\"" "\n";
+        std::cout << "Invalid filename " << std::quoted(file_name) << '\n';
         return;
     }
 
-    // Get char count of file. Note that istream::tellg() returns an std::streampos which is not
+    // Get char count of file. Note that istream::tellg() has_return an std::streampos which is not
     // guaranteed to be the same size as std::size_t (e.g. in the case that the file is greater than
     // 4 GB on a 32-bit system). We will assume that no source files being read exceed this value.
 
@@ -104,9 +108,9 @@ void run(const std::string &file_name)
     std::cout << "== TOKENS ==" << "\n\n";
     for (const auto &token : tokens)
     {
-        std::cout << std::left << std::setw(8)  << token.pos.to_string()
-                               << std::setw(5)  << token.type
-                               << std::setw(20) << token.text << '\n';
+        std::cout << std::left << std::setw(position_column_width) << token.pos.to_string()
+                               << std::setw(type_column_width)     << token.type
+                               << std::setw(text_column_width)     << token.text << '\n';
     }
     std::cout << '\n';
 

@@ -78,7 +78,7 @@ private:
         return {
             .type = type,
             .text = text,
-            .pos = { line_, start_column_ },
+            .pos  = {line_, start_column_},
         };
     }
 
@@ -93,6 +93,6 @@ private:
     std::size_t start_column_;
 };
 
-}
+} // namespace cc
 
 #endif

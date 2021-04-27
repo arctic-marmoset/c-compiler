@@ -5,16 +5,13 @@
 #include "syntax/syntax_type.h"
 
 #include <functional>
+#include <utility>
 #include <vector>
 
 namespace cc {
 
 class syntax_node
 {
-protected:
-    template <typename T>
-    using const_reference = std::reference_wrapper<const T>;
-
 public:
     /**
      * @brief  Returns the type of this node.
@@ -104,16 +101,16 @@ public:
     syntax_node &operator=(syntax_node &&) = delete;
 
 protected:
-    explicit syntax_node(const cc::token &trigger_token)
-        : trigger_token_(trigger_token)
+    explicit syntax_node(cc::token trigger_token)
+        : trigger_token_(std::move(trigger_token))
     {
     }
 
 protected:
     std::vector<syntax_node *> children_;
-    const_reference<cc::token> trigger_token_;
+    cc::token trigger_token_;
 };
 
-}
+} // namespace cc
 
 #endif

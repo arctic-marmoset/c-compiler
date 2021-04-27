@@ -18,7 +18,7 @@ public:
 
 protected:
     explicit statement(const cc::token &trigger_token)
-        : syntax_node(trigger_token)
+        : cc::syntax_node(trigger_token)
     {
     }
 };

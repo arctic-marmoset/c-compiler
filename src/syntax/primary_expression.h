@@ -18,7 +18,7 @@ public:
 
 protected:
     explicit primary_expression(const cc::token &trigger_token)
-        : expression(trigger_token)
+        : cc::expression(trigger_token)
     {
     }
 };
